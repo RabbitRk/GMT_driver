@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GMT</string>
+    <string name="title_activity_driver_job_alert">driverJob_alert</string>
 </resources>

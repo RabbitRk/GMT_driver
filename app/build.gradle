@@ -5,7 +5,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "mark1.gmt.rk_rabbitt.gmt_driver"
-        minSdkVersion 19
+        minSdkVersion 24
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -42,4 +42,5 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.4.0'
 
     implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation 'com.google.firebase:firebase-core:16.0.6'
 }
