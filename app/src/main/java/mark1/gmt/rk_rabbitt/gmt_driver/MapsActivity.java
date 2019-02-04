@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.view.GravityCompat;
@@ -63,9 +64,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -79,19 +89,57 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
+
     //global variables goes on
 
     final static int REQUEST_LOCATION = 199;
+    private static final String MY_API_KEY = "AIzaSyD-6jHfmp3-P27H90-SO-qUi_gB33SiJw0";
+    private static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
     GoogleApiClient mGoogleApiClient;
 
+    SharedPreferences userpref;
+//    TextView userTxt, useridTxt, phoneTxt, emailTxt;
 
+    //get pref variables
+    String user, idd, phone, emaill;
 
+    //variable declaration rk
+    private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
+            new LatLng(11.398194, 79.695358), new LatLng(11.916064, 79.812325));
+    private static final int REQUEST_SELECT_PICK = 1000;
+    public static final String MESSAGE = "OPTION";
 
+    int pickP = 0, dropP = 0;
+
+    Button rent_button, city_button, outstation_button;
+
+    //map utils
+    private GoogleMap mMap;
+    ArrayList<LatLng> MarkerPoints;
+    MarkerOptions options = new MarkerOptions();
+    private Marker oriMarker, destMarker;
+    LocationRequest mLocationRequest;
+    LatLng origin, dest;
+    //Type Variable says about rent or city or out
+    String type;
+    public static final String LOG_TAG = "MapsActivity";
+
+    LinearLayout travel_type;
+
+    //11.766830, 79.766544
+    //11.746899, 79.785601
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkLocationPermission();
+        }
+        // Initializing
+        MarkerPoints = new ArrayList<>();
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         assert mapFragment != null;
@@ -124,20 +172,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         final LocationManager manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER) && hasGPSDevice(this)) {
-            Toast.makeText(this,"Gps already enabled",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Gps already enabled", Toast.LENGTH_SHORT).show();
 
         }
-        if(!hasGPSDevice(this)){
-            Toast.makeText(this,"Gps not Supported",Toast.LENGTH_SHORT).show();
+        if (!hasGPSDevice(this)) {
+            Toast.makeText(this, "Gps not Supported", Toast.LENGTH_SHORT).show();
         }
 
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER) && hasGPSDevice(this)) {
-            Log.e("keshav","Gps already enabled");
-            Toast.makeText(this,"Gps not enabled",Toast.LENGTH_SHORT).show();
+            Log.e("keshav", "Gps already enabled");
+            Toast.makeText(this, "Gps not enabled", Toast.LENGTH_SHORT).show();
             enableLoc();
-        }else{
-            Log.e("keshav","Gps already enabled");
-            Toast.makeText(this,"Gps already enabled",Toast.LENGTH_SHORT).show();
+        } else {
+            Log.e("keshav", "Gps already enabled");
+            Toast.makeText(this, "Gps already enabled", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -151,6 +199,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return false;
         return providers.contains(LocationManager.GPS_PROVIDER);
     }
+
     private void enableLoc() {
 
         if (mGoogleApiClient == null) {
@@ -171,7 +220,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         @Override
                         public void onConnectionFailed(ConnectionResult connectionResult) {
 
-                            Log.d("Location error","Location error " + connectionResult.getErrorCode());
+                            Log.d("Location error", "Location error " + connectionResult.getErrorCode());
                         }
                     }).build();
             mGoogleApiClient.connect();
@@ -207,19 +256,97 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mGoogleApiClient.connect();
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+
+            @Override
+            public void onCameraMove() {
+
+            }
+        });
+
+
+        //Initialize Google Play Services
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            buildGoogleApiClient();
+            mMap.setMyLocationEnabled(true);
+        }
 
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        //Place current location marker
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        Geocoder geocoder;
+        List<Address> addresses;
+        String address = "";
+        geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            address = addresses.get(0).getAddressLine(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Can't get Address", Toast.LENGTH_SHORT).show();
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
+        }
 
+//        pickupLocTxt.setText(address);
+        options = new MarkerOptions();
+
+        // Setting the position of the marker
+        options.position(latLng);
+
+        //move map camerax
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+
+        //stop location updates
+        if (mGoogleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }
+
+        //creating marker onload as staring
+        LatLng latLng1 = new LatLng(location.getLatitude(), location.getLongitude());
+        MarkerOptions markerOptionsOri = new MarkerOptions();
+        markerOptionsOri.position(latLng1);
+        markerOptionsOri.title("Starting point");
+        markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        oriMarker = mMap.addMarker(markerOptionsOri);
+        mMap.addMarker(markerOptionsOri).setDraggable(true);
+        MarkerPoints.add(0, latLng1);
+        //move map camera
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(1000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
     }
 
     @Override
@@ -230,6 +357,280 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+
+    public void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Asking user if explanation is neededx
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+                //Prompt the user once explanation has been shown
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+
+
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+            }
+        }
+    }
+
+    public void addMarker(Place place) {
+
+        try {
+
+            if (pickP == 1) {
+                if (oriMarker != null) {
+                    oriMarker.remove();
+                    MarkerPoints.remove(0);
+                }
+
+                MarkerOptions markerOptionsOri = new MarkerOptions();
+                markerOptionsOri.position(place.getLatLng());
+                markerOptionsOri.title("Starting point");
+                markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                oriMarker = mMap.addMarker(markerOptionsOri);
+                mMap.addMarker(markerOptionsOri).setDraggable(true);
+                MarkerPoints.add(0, place.getLatLng());
+                //move map camera
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+            } else {
+                if (destMarker != null) {
+                    destMarker.remove();
+                    MarkerPoints.remove(1);
+                }
+                MarkerOptions markerOptionsDes = new MarkerOptions();
+                markerOptionsDes.position(place.getLatLng());
+                markerOptionsDes.title("Destination point");
+                markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                destMarker = mMap.addMarker(markerOptionsDes);
+                mMap.addMarker(markerOptionsDes).setDraggable(true);
+                MarkerPoints.add(1, place.getLatLng());
+                //move map camera
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+            }
+
+            if (MarkerPoints.size() > 1) {
+                origin = MarkerPoints.get(0);
+                dest = MarkerPoints.get(1);
+                Log.i(LOG_TAG, "origin marker: " + origin.toString());
+                Log.i(LOG_TAG, "destination marker: " + dest.toString());
+
+                origin = MarkerPoints.get(0);
+                dest = MarkerPoints.get(1);
+
+                animatePath(origin, dest);
+            }
+
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            Log.i("Error in  ", e.getMessage());
+            Toast.makeText(this, "Error in Search", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void animatePath(LatLng origin, LatLng dest) {
+        Log.i(LOG_TAG, "iam animate path");
+        // Getting URL to the Google Directions API
+        String url = getUrl(origin, dest);
+        Log.d("onMapClick", url);
+        FetchUrl FetchUrl = new FetchUrl();
+
+        // Start downloading json data from Google Directions API
+        FetchUrl.execute(url);
+        //move map camera
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(origin));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+    }
+
+    private String getUrl(LatLng origin, LatLng dest) {
+
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+
+        // Destination of route
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + "&" + sensor;
+
+        Toast.makeText(MapsActivity.this, "parameters " + parameters, Toast.LENGTH_SHORT).show();
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + MY_API_KEY;
+
+        Toast.makeText(MapsActivity.this, "url " + url, Toast.LENGTH_SHORT).show();
+
+        return url;
+    }
+
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL(strUrl);
+
+            // Creating an http connection to communicate with url
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            // Connecting to url
+            urlConnection.connect();
+
+            // Reading data from url
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb = new StringBuffer();
+
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            data = sb.toString();
+            Log.d("downloadUrl", data.toString());
+            br.close();
+
+        } catch (Exception e) {
+            Log.d("Exception", e.toString());
+        } finally {
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+    }
+
+    // Fetches data from url passed
+    private class FetchUrl extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... url) {
+
+            // For storing data from web service
+            String data = "";
+
+            try {
+                // Fetching the data from web service
+                data = downloadUrl(url[0]);
+                Log.d("Background Task data", data.toString());
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ParserTask parserTask = new ParserTask();
+
+            // Invokes the thread for parsing the JSON data
+            parserTask.execute(result);
+
+        }
+    }
+
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+        // Parsing the data in non-ui thread
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                Log.d("ParserTask", jsonData[0]);
+                DataParser parser = new DataParser();
+                Log.d("ParserTask", parser.toString());
+
+                // Starts parsing data
+                routes = parser.parse(jObject);
+                Log.d("ParserTask", "Executing routes");
+                Log.d("ParserTask", routes.toString());
+
+            } catch (Exception e) {
+                Log.d("ParserTask", e.toString());
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        // Executes in UI thread, after the parsing process
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+            ArrayList<LatLng> points;
+            PolylineOptions lineOptions = null;
+
+            // Traversing through all the routes
+            for (int i = 0; i < result.size(); i++) {
+                points = new ArrayList<>();
+                lineOptions = new PolylineOptions();
+
+                // Fetching i-th route
+                List<HashMap<String, String>> path = result.get(i);
+
+                // Fetching all the points in i-th route
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+
+                    Toast.makeText(MapsActivity.this, "latitude " + lat + "....longitude " + lng, Toast.LENGTH_SHORT).show();
+
+//RkDk
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+                    Log.i(LOG_TAG, "Points....." + points.toString());
+                }
+
+                // Adding all the points in the route to LineOptions
+
+                if (mMap != null) {
+                    MapAnimator.getInstance().animateRoute(mMap, points);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Map not ready", Toast.LENGTH_LONG).show();
+                }
+
+                Log.d("onPostExecute", "onPostExecute lineoptions decoded");
+
+            }
+
+            // Drawing polyline in the Google Map for the i-th route
+            if (lineOptions != null) {
+                mMap.addPolyline(lineOptions);
+            } else {
+                Log.d("onPostExecute", "without Polylines drawn");
+            }
+        }
     }
 
 }

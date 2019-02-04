@@ -88,7 +88,6 @@ public class firebaseMessengingService extends FirebaseMessagingService {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, 0);
             notificationBuilder.setAutoCancel(true)
-/*                    .setDefaults(Notification.CATEGORY_CALL)*/
                     .setCategory(Notification.CATEGORY_CALL)
                     .setOngoing(true)
                     .setWhen(System.currentTimeMillis())
