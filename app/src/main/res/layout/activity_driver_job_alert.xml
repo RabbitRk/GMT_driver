@@ -23,14 +23,73 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <Button
-        android:id="@+id/button"
+    <TextView
+        android:id="@+id/book_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:onClick="stopAlarm"
-        android:text="Stop" />
+        android:text="booking id" />
+
+    <TextView
+        android:id="@+id/type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="travel type" />
+
+    <TextView
+        android:id="@+id/vehcile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="vehicle type" />
+
+    <TextView
+        android:id="@+id/pickup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="pickup location" />
+
+    <TextView
+        android:id="@+id/drop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="drop location" />
+
+    <TextView
+        android:id="@+id/package_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="package" />
+
+    <TextView
+        android:id="@+id/timeat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="job time" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:id="@+id/accept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:onClick="gotoNavigation"
+            android:text="taken" />
+        <Button
+            android:id="@+id/decline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:onClick="stopAlarm"
+            android:text="Reject" />
+    </LinearLayout>
+
 
 
 </LinearLayout>

@@ -24,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -37,6 +38,20 @@ import mark1.gmt.rk_rabbitt.gmt_driver.driverJob_alert;
  * Created by Rabbitt on 30,January,2019
  */
 public class firebaseMessengingService extends FirebaseMessagingService {
+
+    public final String BOOK_ID = "BOOK_ID";
+    public final String TYPE = "BOOK_ID";
+    public final String VEHICLE = "BOOK_ID";
+    public final String PICKUP = "BOOK_ID";
+    public final String DROP = "BOOK_ID";
+    public final String PACKAGE = "BOOK_ID";
+    public final String TIME = "BOOK_ID";
+    public final String ORI_LAT = "BOOK_ID";
+    public final String ORI_LNG = "BOOK_ID";
+    public final String DEST_LAT = "BOOK_ID";
+    public final String DEST_LNG = "BOOK_ID";
+
+
 
     dbHelper dbHelper;
 
@@ -58,9 +73,6 @@ public class firebaseMessengingService extends FirebaseMessagingService {
         //optionally we can display the json into log
         Log.i("remote", "Notification JSON " + json.toString());
 
-        Intent i=new Intent(this,driverJob_alert.class);
-
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         try {
             //getting the json data
             JSONObject data = json.getJSONObject("data");
@@ -73,8 +85,34 @@ public class firebaseMessengingService extends FirebaseMessagingService {
             String drop = data.getString("drop");
             String time = data.getString("time");
             String package_type = data.getString("title");
+            String ori_lat = data.getString("ori_lat");
+            String ori_lng = data.getString("ori_lng");
+            String dest_lat = data.getString("dest_lat");
+            String dest_lng = data.getString("dest_lng");
+
+
+
+
+
             Log.i("remote", "title..." + book_id);
             Log.i("remote", "body1..." + type);
+
+
+            Intent i=new Intent(this,driverJob_alert.class);
+            i.putExtra(BOOK_ID, book_id);
+            i.putExtra(TYPE, type);
+            i.putExtra(VEHICLE, vehicle);
+            i.putExtra(PICKUP, pickup);
+            i.putExtra(DROP, drop);
+            i.putExtra(TIME, time);
+            i.putExtra(PACKAGE, package_type);
+            i.putExtra(ORI_LAT, ori_lat);
+            i.putExtra(ORI_LNG, ori_lng);
+            i.putExtra(DEST_LAT, dest_lat);
+            i.putExtra(DEST_LNG, dest_lng);
+
+
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
