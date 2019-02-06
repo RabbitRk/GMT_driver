@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -127,8 +128,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     LinearLayout travel_type;
 
-    //11.766830, 79.766544
-    //11.746899, 79.785601
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,8 +168,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void turnOnGPS() {
 
-        //z
-
         final LocationManager manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER) && hasGPSDevice(this)) {
             Toast.makeText(this, "Gps already enabled", Toast.LENGTH_SHORT).show();
@@ -186,6 +184,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             Log.e("keshav", "Gps already enabled");
             Toast.makeText(this, "Gps already enabled", Toast.LENGTH_SHORT).show();
+        }
+        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boolean enabled = service
+                .isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (!enabled) {
+            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(intent);
         }
     }
 
@@ -322,18 +327,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
 
-        //creating marker onload as staring
-        LatLng latLng1 = new LatLng(location.getLatitude(), location.getLongitude());
-        MarkerOptions markerOptionsOri = new MarkerOptions();
-        markerOptionsOri.position(latLng1);
-        markerOptionsOri.title("Starting point");
-        markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-        oriMarker = mMap.addMarker(markerOptionsOri);
-        mMap.addMarker(markerOptionsOri).setDraggable(true);
-        MarkerPoints.add(0, latLng1);
-        //move map camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+//      //  creating marker onload as staring
+//        LatLng latLng1 = new LatLng(location.getLatitude(), location.getLongitude());
+//        MarkerOptions markerOptionsOri = new MarkerOptions();
+//        markerOptionsOri.position(latLng1);
+//        markerOptionsOri.title("Starting point");
+//        markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+//        oriMarker = mMap.addMarker(markerOptionsOri);
+//        mMap.addMarker(markerOptionsOri).setDraggable(true);
+//        MarkerPoints.add(0, latLng1);
+//        //move map camera
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
+//        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
     }
 
     @Override

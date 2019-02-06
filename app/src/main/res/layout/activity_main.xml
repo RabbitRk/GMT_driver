@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/Login_page.AppBarOverlay">
+
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -19,6 +20,14 @@
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/Login_page.PopupOverlay">
         </android.support.v7.widget.Toolbar>
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switch1"
+            android:layout_margin="20dp"
+            android:layout_gravity="right"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" />
+
     </android.support.design.widget.AppBarLayout>
 
     <LinearLayout

@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.dbHelper;
 import mark1.gmt.rk_rabbitt.gmt_driver.MainActivity;
 import mark1.gmt.rk_rabbitt.gmt_driver.MapsActivity;
 import mark1.gmt.rk_rabbitt.gmt_driver.R;
@@ -37,6 +38,8 @@ import mark1.gmt.rk_rabbitt.gmt_driver.driverJob_alert;
  */
 public class firebaseMessengingService extends FirebaseMessagingService {
 
+    dbHelper dbHelper;
+
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         if (remoteMessage.getData().size() > 0) {
@@ -45,7 +48,6 @@ public class firebaseMessengingService extends FirebaseMessagingService {
 
                 JSONObject json = new JSONObject(remoteMessage.getData().toString());
                 sendPushNotification(json);
-                //Log.i("json", json.toString());
             } catch (Exception e) {
                 Log.e("remote", "Exception: " + e.getMessage());
             }
@@ -64,10 +66,15 @@ public class firebaseMessengingService extends FirebaseMessagingService {
             JSONObject data = json.getJSONObject("data");
 
             //parsing json data
-            String title = data.getString("title");
-            String message = data.getString("body");
-            Log.i("remote", "title..." + title);
-            Log.i("remote", "body1..." + message);
+            String book_id = data.getString("book_id");
+            String type = data.getString("type");
+            String vehicle = data.getString("vehicle");
+            String pickup = data.getString("pickup");
+            String drop = data.getString("drop");
+            String time = data.getString("time");
+            String package_type = data.getString("title");
+            Log.i("remote", "title..." + book_id);
+            Log.i("remote", "body1..." + type);
 
             NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
@@ -94,9 +101,9 @@ public class firebaseMessengingService extends FirebaseMessagingService {
                     .setSmallIcon(R.drawable.ic_bell)
                     .setTicker("Hearty365")
                     .setPriority(Notification.PRIORITY_HIGH)
-                    .setContentTitle("Default notification")
+                    .setContentTitle("GMT driver")
                     .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
-                    .setContentText("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
+                    .setContentText(book_id+" "+type+" "+vehicle+" "+pickup+" "+drop+" "+package_type+" "+time)
                     .setFullScreenIntent(pendingIntent,true)
                     .setVisibility(1)
                     .setContentInfo("Info");

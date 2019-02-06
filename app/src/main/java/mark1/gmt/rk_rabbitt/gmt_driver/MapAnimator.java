@@ -38,18 +38,18 @@ public class MapAnimator {
     static final int GREY = Color.parseColor("#FFA7A6A6");
 
 
-    private MapAnimator(){
+    private MapAnimator() {
 
     }
 
-    public static MapAnimator getInstance(){
-        if(mapAnimator == null) mapAnimator = new MapAnimator();
+    public static MapAnimator getInstance() {
+        if (mapAnimator == null) mapAnimator = new MapAnimator();
         return mapAnimator;
     }
 
 
     public void animateRoute(GoogleMap googleMap, List<LatLng> Route) {
-        if (firstRunAnimSet == null){
+        if (firstRunAnimSet == null) {
             firstRunAnimSet = new AnimatorSet();
         } else {
             firstRunAnimSet.removeAllListeners();
@@ -155,7 +155,6 @@ public class MapAnimator {
             }
         });
         foregroundRouteAnimator.setDuration(1600);
-//        foregroundRouteAnimator.start();
 
         firstRunAnimSet.playSequentially(foregroundRouteAnimator,
                 percentageCompletion);
