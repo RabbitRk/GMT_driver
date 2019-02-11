@@ -42,9 +42,13 @@ import mark1.gmt.rk_rabbitt.gmt_driver.driverJob_alert;
 public class firebaseMessengingService extends FirebaseMessagingService {
 
     SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
-    public static String BOOK_ID = "BOOK_ID1";
-    public static String TYPE = "TYPE1";
+
+    public static String SHARED_PREFS= "SHARED_PREFS";
+    public static String BOOK_ID = "BOOK_ID";
+    public static String TYPE = "TYPE";
+
 //    public static final String VEHICLE = "VEHICLE";
 //    public static final String PICKUP = "PICKUP";
 //    public static final String DROP = "DROP";
@@ -55,8 +59,7 @@ public class firebaseMessengingService extends FirebaseMessagingService {
 //    public static final String DEST_LAT = "DEST_LAT";
 //    public static final String DEST_LNG = "DEST_LNG";
 
-    prefsManager prefsManager = new prefsManager(getApplicationContext());
-
+//    prefsManager prefsManager = new prefsManager(this);
 
     dbHelper dbHelper;
 
@@ -73,6 +76,7 @@ public class firebaseMessengingService extends FirebaseMessagingService {
             }
         }
     }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void sendPushNotification(JSONObject json) {
         //optionally we can display the json into log
@@ -98,9 +102,16 @@ public class firebaseMessengingService extends FirebaseMessagingService {
             Log.i("remote", "title..." + book_id);
             Log.i("remote", "body1..." + type);
 
-            prefsManager.userPreferences(book_id, type);
+//            prefsManager.userPreferences(book_id, type);
 
-            Intent i=new Intent(this,driverJob_alert.class);
+            sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+            editor = sharedPreferences.edit();
+            editor.putString(BOOK_ID, book_id);
+            editor.putString(TYPE, type);
+            editor.apply();
+
+            Intent i = new Intent(this, driverJob_alert.class);
+
 //            i.putExtra(BOOK_ID, book_id);
 //            i.putExtra(TYPE, type);
 //            i.putExtra(VEHICLE, vehicle);
@@ -142,8 +153,8 @@ public class firebaseMessengingService extends FirebaseMessagingService {
                     .setPriority(Notification.PRIORITY_HIGH)
                     .setContentTitle("GMT driver")
                     .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
-                    .setContentText(book_id+" "+type+" "+vehicle+" "+pickup+" "+drop+" "+package_type+" "+time)
-                    .setFullScreenIntent(pendingIntent,true)
+                    .setContentText(book_id + " " + type + " " + vehicle + " " + pickup + " " + drop + " " + package_type + " " + time)
+                    .setFullScreenIntent(pendingIntent, true)
                     .setVisibility(1)
                     .setContentInfo("Info");
 

@@ -16,9 +16,9 @@ import android.widget.TextView;
 
 import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.dbHelper;
 
-import static mark1.gmt.rk_rabbitt.gmt_driver.Preferences.prefsManager.ID_KEY;
-import static mark1.gmt.rk_rabbitt.gmt_driver.Preferences.prefsManager.TYPE;
-import static mark1.gmt.rk_rabbitt.gmt_driver.Preferences.prefsManager.USER_PREFS;
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.TYPE;
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.BOOK_ID;
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.SHARED_PREFS;
 
 public class driverJob_alert extends AppCompatActivity {
 
@@ -71,8 +71,8 @@ public class driverJob_alert extends AppCompatActivity {
 //        dest_lat = intent.getStringExtra("DEST_LAT");
 //        dest_lng = intent.getStringExtra("DEST_LNG");
 
-        shrp = getSharedPreferences(USER_PREFS, MODE_PRIVATE);
-        book_id = shrp.getString(ID_KEY, "0");
+        shrp = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        book_id = shrp.getString(BOOK_ID, "0");
         type = shrp.getString(TYPE, "0");
 
 
@@ -86,9 +86,6 @@ public class driverJob_alert extends AppCompatActivity {
         package_idTxt.setText(package_type);
 
         Log.i("logs", book_id+" "+type+" "+vehicle+" "+pickup+" "+drop+" "+time);
-
-
-
 
         //ringing alarm to alert the driver
         Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
