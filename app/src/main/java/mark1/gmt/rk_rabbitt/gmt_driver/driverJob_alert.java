@@ -16,9 +16,18 @@ import android.widget.TextView;
 
 import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.dbHelper;
 
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.DEST_LAT;
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.DEST_LNG;
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.DROP;
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.ORI_LAT;
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.ORI_LNG;
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.PACKAGE;
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.PICKUP;
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.TIME;
 import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.TYPE;
 import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.BOOK_ID;
 import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.SHARED_PREFS;
+import static mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification.firebaseMessengingService.VEHICLE;
 
 public class driverJob_alert extends AppCompatActivity {
 
@@ -41,6 +50,7 @@ public class driverJob_alert extends AppCompatActivity {
 
     TextView book_idTxt, typeTxt, vehicleTxt, package_idTxt, pickupTxt, dropTxt, timeTxt;
 
+    public static String oriLat, oriLng;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,24 +67,19 @@ public class driverJob_alert extends AppCompatActivity {
         dropTxt = findViewById(R.id.drop);
         timeTxt = findViewById(R.id.timeat);
 
-        //getting values from the notification
-//        Intent intent = getIntent();
-//        book_id = intent.getStringExtra(BOOK_ID);
-//        type = intent.getStringExtra(TYPE);
-//        vehicle = intent.getStringExtra("VEHICLE");
-//        pickup = intent.getStringExtra("PICKUP");
-//        drop = intent.getStringExtra("DROP");
-//        time = intent.getStringExtra("TIME");
-//        package_type = intent.getStringExtra("PACKAGE");
-//        ori_lat = intent.getStringExtra("ORI_LAT");
-//        ori_lng = intent.getStringExtra("ORI_LNG");
-//        dest_lat = intent.getStringExtra("DEST_LAT");
-//        dest_lng = intent.getStringExtra("DEST_LNG");
-
+        //getting values from the sharedprefs
         shrp = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         book_id = shrp.getString(BOOK_ID, "0");
         type = shrp.getString(TYPE, "0");
-
+        vehicle = shrp.getString(VEHICLE, "0");
+        pickup = shrp.getString(PICKUP, "0");
+        drop = shrp.getString(DROP, "0");
+        time = shrp.getString(TIME, "0");
+        package_type = shrp.getString(PACKAGE, "0");
+        ori_lat = shrp.getString(ORI_LAT, "0");
+        ori_lng = shrp.getString(ORI_LNG, "0");
+        dest_lat = shrp.getString(DEST_LAT, "0");
+        dest_lng = shrp.getString(DEST_LNG, "0");
 
         //setting the info to the job alert page
         book_idTxt.setText(book_id);
@@ -109,6 +114,9 @@ public class driverJob_alert extends AppCompatActivity {
 
     public void stopAlarm(View view) {
         ringtone.stop();
+        SharedPreferences.Editor editor = shrp.edit();
+        editor.clear();
+        editor.apply();
         finish();
     }
 
@@ -117,6 +125,9 @@ public class driverJob_alert extends AppCompatActivity {
 
         dbHelpar.insertdata(book_id, time, type, vehicle, pickup, drop, package_type);
         Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra(ori_lat, pickup);
+        intent.putExtra(ori_lng, drop);
+
 
         startActivity(intent);
 

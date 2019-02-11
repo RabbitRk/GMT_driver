@@ -31,7 +31,7 @@ public class dbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        br = "CREATE TABLE " + TABLE + "(" + bookid + " text, " + timeat + " Text, " + travel_type + " Text, " + v_type + " Text, " + ori + " Text, " + dest + " Text);";
+        br = "CREATE TABLE " + TABLE + "(" + bookid + " Text, " + timeat + " Text, " + travel_type + " Text, " + v_type + " Text, " + ori + " Text, " + dest + " Text, " + package_id + " Text);";
         db.execSQL(br);
     }
 

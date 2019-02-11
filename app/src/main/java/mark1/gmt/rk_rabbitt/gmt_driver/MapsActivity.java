@@ -92,7 +92,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     //global variables goes on
-
     final static int REQUEST_LOCATION = 199;
     private static final String MY_API_KEY = "AIzaSyD-6jHfmp3-P27H90-SO-qUi_gB33SiJw0";
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -128,15 +127,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     LinearLayout travel_type;
 
-
+    LatLng oriLatlng;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkLocationPermission();
-        }
+        checkLocationPermission();
+
+        //getting intent values
+        Intent intent = getIntent();
+        double oriLat = Double.parseDouble(intent.getStringExtra(driverJob_alert.oriLat));
+        double oriLng = Double.parseDouble(intent.getStringExtra(driverJob_alert.oriLng));
+//        double oriLng = Double.parseDouble(intent.getStringExtra(driverJob_alert.oriLng));
+//        double oriLng = Double.parseDouble(intent.getStringExtra(driverJob_alert.oriLng));
+
+        oriLatlng = new LatLng(oriLat, oriLng);
+
         // Initializing
         MarkerPoints = new ArrayList<>();
 
@@ -339,6 +346,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        //move map camera
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
 //        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+        animatePath(oriLatlng, latLng);
     }
 
     @Override
@@ -394,6 +402,63 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void addMarker(Place place) {
+
+        try {
+
+            if (pickP == 1) {
+                if (oriMarker != null) {
+                    oriMarker.remove();
+                    MarkerPoints.remove(0);
+                }
+
+                MarkerOptions markerOptionsOri = new MarkerOptions();
+                markerOptionsOri.position(place.getLatLng());
+                markerOptionsOri.title("Starting point");
+                markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                oriMarker = mMap.addMarker(markerOptionsOri);
+                mMap.addMarker(markerOptionsOri).setDraggable(true);
+                MarkerPoints.add(0, place.getLatLng());
+                //move map camera
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+            } else {
+                if (destMarker != null) {
+                    destMarker.remove();
+                    MarkerPoints.remove(1);
+                }
+                MarkerOptions markerOptionsDes = new MarkerOptions();
+                markerOptionsDes.position(place.getLatLng());
+                markerOptionsDes.title("Destination point");
+                markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                destMarker = mMap.addMarker(markerOptionsDes);
+                mMap.addMarker(markerOptionsDes).setDraggable(true);
+                MarkerPoints.add(1, place.getLatLng());
+                //move map camera
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+            }
+
+            if (MarkerPoints.size() > 1) {
+                origin = MarkerPoints.get(0);
+                dest = MarkerPoints.get(1);
+                Log.i(LOG_TAG, "origin marker: " + origin.toString());
+                Log.i(LOG_TAG, "destination marker: " + dest.toString());
+
+                origin = MarkerPoints.get(0);
+                dest = MarkerPoints.get(1);
+
+                animatePath(origin, dest);
+            }
+
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            Log.i("Error in  ", e.getMessage());
+            Toast.makeText(this, "Error in Search", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void getRide(Place place) {
 
         try {
 

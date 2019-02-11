@@ -48,18 +48,15 @@ public class firebaseMessengingService extends FirebaseMessagingService {
     public static String SHARED_PREFS= "SHARED_PREFS";
     public static String BOOK_ID = "BOOK_ID";
     public static String TYPE = "TYPE";
-
-//    public static final String VEHICLE = "VEHICLE";
-//    public static final String PICKUP = "PICKUP";
-//    public static final String DROP = "DROP";
-//    public static final String PACKAGE = "PACKAGE";
-//    public static final String TIME = "TIME";
-//    public static final String ORI_LAT = "ORI_LAT";
-//    public static final String ORI_LNG = "ORI_LNG";
-//    public static final String DEST_LAT = "DEST_LAT";
-//    public static final String DEST_LNG = "DEST_LNG";
-
-//    prefsManager prefsManager = new prefsManager(this);
+    public static String VEHICLE = "VEHICLE";
+    public static String PICKUP = "PICKUP";
+    public static String DROP = "DROP";
+    public static String PACKAGE = "PACKAGE";
+    public static String TIME = "TIME";
+    public static String ORI_LAT = "ORI_LAT";
+    public static String ORI_LNG = "ORI_LNG";
+    public static String DEST_LAT = "DEST_LAT";
+    public static String DEST_LNG = "DEST_LNG";
 
     dbHelper dbHelper;
 
@@ -102,28 +99,23 @@ public class firebaseMessengingService extends FirebaseMessagingService {
             Log.i("remote", "title..." + book_id);
             Log.i("remote", "body1..." + type);
 
-//            prefsManager.userPreferences(book_id, type);
-
+            //setting shared prefs
             sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
             editor = sharedPreferences.edit();
             editor.putString(BOOK_ID, book_id);
             editor.putString(TYPE, type);
+            editor.putString(VEHICLE, vehicle);
+            editor.putString(PICKUP, pickup);
+            editor.putString(DROP, drop);
+            editor.putString(PACKAGE, package_type);
+            editor.putString(TIME, time);
+            editor.putString(ORI_LAT, ori_lat);
+            editor.putString(ORI_LNG, ori_lng);
+            editor.putString(DEST_LAT, dest_lat);
+            editor.putString(DEST_LNG, dest_lng);
             editor.apply();
 
             Intent i = new Intent(this, driverJob_alert.class);
-
-//            i.putExtra(BOOK_ID, book_id);
-//            i.putExtra(TYPE, type);
-//            i.putExtra(VEHICLE, vehicle);
-//            i.putExtra(PICKUP, pickup);
-//            i.putExtra(DROP, drop);
-//            i.putExtra(TIME, time);
-//            i.putExtra(PACKAGE, package_type);
-//            i.putExtra(ORI_LAT, ori_lat);
-//            i.putExtra(ORI_LNG, ori_lng);
-//            i.putExtra(DEST_LAT, dest_lat);
-//            i.putExtra(DEST_LNG, dest_lng);
-
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
