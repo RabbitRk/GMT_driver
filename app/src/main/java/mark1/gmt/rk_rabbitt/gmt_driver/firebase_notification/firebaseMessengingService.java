@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -31,6 +32,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.dbHelper;
 import mark1.gmt.rk_rabbitt.gmt_driver.MainActivity;
 import mark1.gmt.rk_rabbitt.gmt_driver.MapsActivity;
+import mark1.gmt.rk_rabbitt.gmt_driver.Preferences.prefsManager;
 import mark1.gmt.rk_rabbitt.gmt_driver.R;
 import mark1.gmt.rk_rabbitt.gmt_driver.driverJob_alert;
 
@@ -39,18 +41,21 @@ import mark1.gmt.rk_rabbitt.gmt_driver.driverJob_alert;
  */
 public class firebaseMessengingService extends FirebaseMessagingService {
 
-    public final String BOOK_ID = "BOOK_ID";
-    public final String TYPE = "BOOK_ID";
-    public final String VEHICLE = "BOOK_ID";
-    public final String PICKUP = "BOOK_ID";
-    public final String DROP = "BOOK_ID";
-    public final String PACKAGE = "BOOK_ID";
-    public final String TIME = "BOOK_ID";
-    public final String ORI_LAT = "BOOK_ID";
-    public final String ORI_LNG = "BOOK_ID";
-    public final String DEST_LAT = "BOOK_ID";
-    public final String DEST_LNG = "BOOK_ID";
+    SharedPreferences sharedPreferences;
 
+    public static String BOOK_ID = "BOOK_ID1";
+    public static String TYPE = "TYPE1";
+//    public static final String VEHICLE = "VEHICLE";
+//    public static final String PICKUP = "PICKUP";
+//    public static final String DROP = "DROP";
+//    public static final String PACKAGE = "PACKAGE";
+//    public static final String TIME = "TIME";
+//    public static final String ORI_LAT = "ORI_LAT";
+//    public static final String ORI_LNG = "ORI_LNG";
+//    public static final String DEST_LAT = "DEST_LAT";
+//    public static final String DEST_LNG = "DEST_LNG";
+
+    prefsManager prefsManager = new prefsManager(getApplicationContext());
 
 
     dbHelper dbHelper;
@@ -84,33 +89,29 @@ public class firebaseMessengingService extends FirebaseMessagingService {
             String pickup = data.getString("pickup");
             String drop = data.getString("drop");
             String time = data.getString("time");
-            String package_type = data.getString("title");
+            String package_type = data.getString("package");
             String ori_lat = data.getString("ori_lat");
             String ori_lng = data.getString("ori_lng");
             String dest_lat = data.getString("dest_lat");
             String dest_lng = data.getString("dest_lng");
 
-
-
-
-
             Log.i("remote", "title..." + book_id);
             Log.i("remote", "body1..." + type);
 
+            prefsManager.userPreferences(book_id, type);
 
             Intent i=new Intent(this,driverJob_alert.class);
-            i.putExtra(BOOK_ID, book_id);
-            i.putExtra(TYPE, type);
-            i.putExtra(VEHICLE, vehicle);
-            i.putExtra(PICKUP, pickup);
-            i.putExtra(DROP, drop);
-            i.putExtra(TIME, time);
-            i.putExtra(PACKAGE, package_type);
-            i.putExtra(ORI_LAT, ori_lat);
-            i.putExtra(ORI_LNG, ori_lng);
-            i.putExtra(DEST_LAT, dest_lat);
-            i.putExtra(DEST_LNG, dest_lng);
-
+//            i.putExtra(BOOK_ID, book_id);
+//            i.putExtra(TYPE, type);
+//            i.putExtra(VEHICLE, vehicle);
+//            i.putExtra(PICKUP, pickup);
+//            i.putExtra(DROP, drop);
+//            i.putExtra(TIME, time);
+//            i.putExtra(PACKAGE, package_type);
+//            i.putExtra(ORI_LAT, ori_lat);
+//            i.putExtra(ORI_LNG, ori_lng);
+//            i.putExtra(DEST_LAT, dest_lat);
+//            i.putExtra(DEST_LNG, dest_lng);
 
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 

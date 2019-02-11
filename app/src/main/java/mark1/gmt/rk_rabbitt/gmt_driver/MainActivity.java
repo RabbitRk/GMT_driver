@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -23,7 +24,7 @@ import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.recycleAdapter;
  */
 public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
 
-    Switch login;
+    SwitchCompat login;
     RecyclerView job_alert_recycler;
     dbHelper database;
     job_alert_adapter recycler;
