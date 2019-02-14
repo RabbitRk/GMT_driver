@@ -2,6 +2,7 @@ package mark1.gmt.rk_rabbitt.gmt_driver;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ public class job_alert_adapter extends RecyclerView.Adapter<job_alert_adapter.ho
     @Override
     public void onBindViewHolder(@NonNull job_alert_adapter.holder holder, int i) {
         recycleAdapter dataModel = dataModelArrayList.get(i);
+        Log.i("recyclerre", dataModelArrayList.get(i).toString());
         holder.book_id.setText(dataModel.getBook_id());
         holder.v_type.setText(dataModel.getV_type());
         holder.travel_type.setText(dataModel.getTravel_type());
@@ -43,6 +45,7 @@ public class job_alert_adapter extends RecyclerView.Adapter<job_alert_adapter.ho
 
     @Override
     public int getItemCount() {
+        Log.i("adapterre", String.valueOf(dataModelArrayList.size()));
         return dataModelArrayList.size();
     }
 
@@ -59,7 +62,7 @@ public class job_alert_adapter extends RecyclerView.Adapter<job_alert_adapter.ho
             dateof = itemView.findViewById(R.id.dateof);
             ori = itemView.findViewById(R.id.ori);
             dest = itemView.findViewById(R.id.dest);
-            package_id = itemView.findViewById(R.id.packed);
+            package_id = itemView.findViewById(R.id.pakage);
         }
     }
 }

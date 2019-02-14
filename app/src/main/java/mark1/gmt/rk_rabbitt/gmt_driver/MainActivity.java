@@ -37,9 +37,20 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         login = findViewById(R.id.switch1);
         job_alert_recycler = findViewById(R.id.jobsRecycler);
         login.setOnCheckedChangeListener(this);
+
         productAdapter = new ArrayList<>();
         //code begins
         database = new dbHelper(this);
+
+//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
+//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
+//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
+//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
+//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
+//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
+//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
+//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
+//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
 
         productAdapter = database.getdata();
 

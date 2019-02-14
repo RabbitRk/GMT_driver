@@ -50,13 +50,17 @@ public class driverJob_alert extends AppCompatActivity {
 
     TextView book_idTxt, typeTxt, vehicleTxt, package_idTxt, pickupTxt, dropTxt, timeTxt;
 
-    public static String oriLat, oriLng;
+    public static final String oriLata = "orilat", oriLnga = "orilng";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_job_alert);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        dbHelpar =  new dbHelper(this);
+
 
         //Textview initialization
         book_idTxt = findViewById(R.id.book_id);
@@ -121,15 +125,14 @@ public class driverJob_alert extends AppCompatActivity {
     }
 
     public void gotoNavigation(View view) {
+
         ringtone.stop();
 
         dbHelpar.insertdata(book_id, time, type, vehicle, pickup, drop, package_type);
         Intent intent = new Intent(this, MapsActivity.class);
-        intent.putExtra(ori_lat, pickup);
-        intent.putExtra(ori_lng, drop);
-
+        intent.putExtra(oriLata, ori_lat);
+        intent.putExtra(oriLnga, ori_lng);
 
         startActivity(intent);
-
     }
 }

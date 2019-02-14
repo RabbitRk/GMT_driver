@@ -8,23 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="Login_page" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
     <style name="Login_page.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Login_page.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="NavigationDrawerStyle">
-        <item name="android:textSize">16sp</item><!-- text size in menu-->
-        <item name="android:typeface">serif</item>
-        <item name="android:listPreferredItemHeightSmall">40dp</item><!-- item size in menu-->
-        <item name="listPreferredItemHeightSmall">40dp</item><!-- item size in menu-->
-    </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

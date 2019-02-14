@@ -1,6 +1,7 @@
 package mark1.gmt.rk_rabbitt.gmt_driver;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.location.LocationManager;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.animation.TranslateAnimation;
@@ -137,8 +139,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //getting intent values
         Intent intent = getIntent();
-        double oriLat = Double.parseDouble(intent.getStringExtra(driverJob_alert.oriLat));
-        double oriLng = Double.parseDouble(intent.getStringExtra(driverJob_alert.oriLng));
+        String oriLati = intent.getStringExtra(driverJob_alert.oriLata);
+        String oriLngi = intent.getStringExtra(driverJob_alert.oriLnga);
+
+        double oriLat = Double.parseDouble(oriLati);
+        double oriLng = Double.parseDouble(oriLngi);
+
 //        double oriLng = Double.parseDouble(intent.getStringExtra(driverJob_alert.oriLng));
 //        double oriLng = Double.parseDouble(intent.getStringExtra(driverJob_alert.oriLng));
 
@@ -366,12 +372,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onConnectionSuspended(int i) {
 
     }
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-
 
     public void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this,
@@ -594,6 +598,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return data;
     }
 
+    public void getRide(View view) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("Did you pick up the customer ?");
+                alertDialogBuilder.setPositiveButton("yes",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+
+                                startTimerDistance();
+
+                            }
+                        });
+
+        alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    private void startTimerDistance() {
+
+        Toast.makeText(this, "hello", Toast.LENGTH_SHORT).show();
+    }
+
+    public void decline(View view) {
+        Toast.makeText(this, "Declined", Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
     // Fetches data from url passed
     private class FetchUrl extends AsyncTask<String, Void, String> {
 
@@ -702,5 +740,4 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-
 }

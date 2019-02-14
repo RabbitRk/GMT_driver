@@ -6,18 +6,7 @@ public class recycleAdapter{
     public String book_id;
     public String origin, destination;
     public String v_type;
-
-
     public String package_id;
-//
-//    public recycleAdapter(String timeat, String travel_type, String book_id, String origin, String destination, String v_type) {
-//        this.timeat = timeat;
-//        this.travel_type = travel_type;
-//        this.book_id = book_id;
-//        this.origin = origin;
-//        this.destination = destination;
-//        this.v_type = v_type;
-//    }
 
     public String getV_type() {
         return v_type;
@@ -42,6 +31,11 @@ public class recycleAdapter{
     public String getDestination() {
         return destination;
     }
+
+    public String getPackage_id() {
+        return package_id;
+    }
+
 
     public void setTimeat(String timeat) {
         this.timeat = timeat;
@@ -69,10 +63,5 @@ public class recycleAdapter{
 
     public void setPackage_id(String package_id) {
         this.package_id = package_id;
-    }
-
-    public String getPackage_id() {
-
-        return package_id;
     }
 }

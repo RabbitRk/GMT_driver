@@ -14,7 +14,7 @@ import java.util.List;
 
 public class dbHelper extends SQLiteOpenHelper {
 
-    public static String DATABASE = "your_job.db";
+    public static String DATABASE = "your_jobGMT.db";
     public static String TABLE = "jobs";
     public static String timeat = "timeat";
     public static String bookid = "bookid";
@@ -22,7 +22,7 @@ public class dbHelper extends SQLiteOpenHelper {
     public static String v_type = "v_type";
     public static String ori = "ori";
     public static String dest = "dest";
-    public static String package_id= "package_id";
+    public static String package_id = "package_id";
     String br = "";
 
     public dbHelper(Context context) {
@@ -32,6 +32,7 @@ public class dbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         br = "CREATE TABLE " + TABLE + "(" + bookid + " Text, " + timeat + " Text, " + travel_type + " Text, " + v_type + " Text, " + ori + " Text, " + dest + " Text, " + package_id + " Text);";
+        Log.i("tablecreate", br);
         db.execSQL(br);
     }
 
@@ -41,7 +42,7 @@ public class dbHelper extends SQLiteOpenHelper {
     }
 
     public void insertdata(String bookid1, String timeat1, String travel_type1, String v_type1, String ori1, String dest1, String package_id1) {
-        System.out.print("Hello " + br);
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -52,7 +53,9 @@ public class dbHelper extends SQLiteOpenHelper {
         contentValues.put(ori, ori1);
         contentValues.put(dest, dest1);
         contentValues.put(package_id, package_id1);
-        Log.i("logtaginsert",contentValues.get(bookid).toString());
+
+        Log.i("logtaginsert", contentValues.get(bookid).toString());
+
         db.insert(TABLE, null, contentValues);
     }
 
@@ -61,31 +64,35 @@ public class dbHelper extends SQLiteOpenHelper {
         List<recycleAdapter> data = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String getride = "select * from "+TABLE;
-        Log.i("logtag","query"+getride  );
+        String getride = "select * from " + TABLE;
+        Log.i("logtag", "query" + getride);
 
         Cursor cursor = db.rawQuery(getride, null);
         StringBuilder stringBuffer = new StringBuilder();
         recycleAdapter dataModel = null;
-        Log.i("logtag","outside while");
-        Log.i("logtag",cursor.toString());
-        Log.i("logtag",String.valueOf(cursor.getCount()));
+        Log.i("logtag", "outside while");
+        Log.i("logtag", cursor.toString());
+        Log.i("logtag", String.valueOf(cursor.getCount()));
 
+        Log.i("logtag", cursor.toString());
 
-        if (cursor.moveToFirst())
-        { Log.i("logtag","inside do");
-             do {
+        if(cursor.moveToFirst())
+        {
+
+            Log.i("logtag", "inside do");
+            do {
                 dataModel = new recycleAdapter();
-                 Log.i("logtag","outside while");
-                String bookid = cursor.getString(cursor.getColumnIndexOrThrow("bookid"));
-                String travel_type = cursor.getString(cursor.getColumnIndexOrThrow("travel_type"));
-                String v_type = cursor.getString(cursor.getColumnIndexOrThrow("v_type"));
-                String timeat = cursor.getString(cursor.getColumnIndexOrThrow("timeat"));
-                String dest = cursor.getString(cursor.getColumnIndexOrThrow("dest"));
-                String ori = cursor.getString(cursor.getColumnIndexOrThrow("ori"));
-                String package_id = cursor.getString(cursor.getColumnIndexOrThrow("package_id"));
+                Log.i("logtag", "outside while");
+                String bookid = cursor.getString(cursor.getColumnIndex("bookid"));
+                String travel_type = cursor.getString(cursor.getColumnIndex("travel_type"));
+                String v_type = cursor.getString(cursor.getColumnIndex("v_type"));
+                String timeat = cursor.getString(cursor.getColumnIndex("timeat"));
+                String dest = cursor.getString(cursor.getColumnIndex("dest"));
+                String ori = cursor.getString(cursor.getColumnIndex("ori"));
+                String package_id = cursor.getString(cursor.getColumnIndex("package_id"));
 
-                Log.i("logtag",bookid);
+                Log.i("logtag", bookid);
+
                 dataModel.setBook_id(bookid);
                 dataModel.setOrigin(ori);
                 dataModel.setDestination(dest);
@@ -95,9 +102,9 @@ public class dbHelper extends SQLiteOpenHelper {
                 dataModel.setPackage_id(package_id);
 
                 stringBuffer.append(dataModel);
-                // stringBuffer.append(dataModel);
                 data.add(dataModel);
-            }while (cursor.moveToNext());
+
+            } while (cursor.moveToNext());
         }
         cursor.close();
         db.close();
@@ -110,6 +117,7 @@ public class dbHelper extends SQLiteOpenHelper {
 
         //
 
+        Log.i("dbhelper", String.valueOf(data.size()));
         return data;
     }
 
