@@ -190,8 +190,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //convertiong
-    public void typeFinding(String oriLati, String oriLngi, String desLati, String desLngi, String type_, String package_, String vehicle_)
-    {
+    public void typeFinding(String oriLati, String oriLngi, String desLati, String desLngi, String type_, String package_, String vehicle_) {
         //converting string to double
         double oriLat = Double.parseDouble(oriLati);
         double oriLng = Double.parseDouble(oriLngi);
@@ -202,34 +201,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         oriLatlng = new LatLng(oriLat, oriLng);
         desLatlng = new LatLng(desLat, desLng);
 
-        switch (type_)
-        {
+        switch (type_) {
             case "rental":
                 rentalAnimator(oriLatlng);
             case "city":
                 cityAnimator(oriLatlng, desLatlng);
             case "outstation":
-                MarkerOptions markerOptionsOri = new MarkerOptions();
-                markerOptionsOri.position(oriLatlng);
-                markerOptionsOri.title("Starting point");
-                markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-                oriMarker = mMap.addMarker(markerOptionsOri);
-
-                MarkerOptions markerOptionsDes = new MarkerOptions();
-                markerOptionsDes.position(desLatlng);
-                markerOptionsDes.title("Destination point");
-                markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-                destMarker = mMap.addMarker(markerOptionsDes);
-
-                //calling polyline
-                animatePath(oriLatlng, desLatlng);
-                //calling zoomfuntion
-                zoomout(oriMarker, destMarker);
-
+                outstationAnimator(oriLatlng, desLatlng);
             default:
                 Toast.makeText(this, "Can't get the Travel type", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void outstationAnimator(LatLng oriLatlng, LatLng desLatlng) {
+        MarkerOptions markerOptionsOri = new MarkerOptions();
+        markerOptionsOri.position(oriLatlng);
+        markerOptionsOri.title("Starting point");
+        markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        oriMarker = mMap.addMarker(markerOptionsOri);
+
+        MarkerOptions markerOptionsDes = new MarkerOptions();
+        markerOptionsDes.position(desLatlng);
+        markerOptionsDes.title("Destination point");
+        markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        destMarker = mMap.addMarker(markerOptionsDes);
+
+        //calling polyline
+        animatePath(oriLatlng, desLatlng);
+        //calling zoomfuntion
+        zoomout(oriMarker, destMarker);
+    }
+
 
     private void cityAnimator(LatLng oriLatlng, LatLng desLatlng) {
         MarkerOptions markerOptionsOri = new MarkerOptions();
@@ -250,8 +252,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         zoomout(oriMarker, destMarker);
     }
 
-    public void rentalAnimator(LatLng oriLatlng)
-    {
+    public void rentalAnimator(LatLng oriLatlng) {
         MarkerOptions markerOptionsOri = new MarkerOptions();
         markerOptionsOri.position(oriLatlng);
         markerOptionsOri.title("Starting point");
@@ -412,7 +413,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onLocationChanged(Location location) {
         //Place current location marker
-        userLatlng= new LatLng(location.getLatitude(), location.getLongitude());
+        userLatlng = new LatLng(location.getLatitude(), location.getLongitude());
         Geocoder geocoder;
         List<Address> addresses;
         String address = "";
@@ -456,8 +457,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
     }
 
-    public void zoomout(Marker oriMarker, Marker destMarker)
-    {
+    public void zoomout(Marker oriMarker, Marker destMarker) {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
 //the include method will calculate the min and max bound.
