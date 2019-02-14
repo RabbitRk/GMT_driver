@@ -58,6 +58,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -120,7 +121,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     ArrayList<LatLng> MarkerPoints;
     MarkerOptions options = new MarkerOptions();
-    private Marker oriMarker, destMarker;
+    private Marker oriMarker, destMarker, userMarker;
     LocationRequest mLocationRequest;
     LatLng origin, dest;
     //Type Variable says about rent or city or out
@@ -129,7 +130,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     LinearLayout travel_type;
 
-    LatLng oriLatlng;
+    LatLng oriLatlng, desLatlng, userLatlng;
+
+    String oriLati;
+    String oriLngi;
+    String desLati;
+    String desLngi;
+
+    String type_, package_, vehicle_;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,16 +148,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //getting intent values
         Intent intent = getIntent();
-        String oriLati = intent.getStringExtra(driverJob_alert.oriLata);
-        String oriLngi = intent.getStringExtra(driverJob_alert.oriLnga);
+        oriLati = intent.getStringExtra(driverJob_alert.oriLata);
+        oriLngi = intent.getStringExtra(driverJob_alert.oriLnga);
+        desLati = intent.getStringExtra(driverJob_alert.oriLnga);
+        desLngi = intent.getStringExtra(driverJob_alert.oriLnga);
 
-        double oriLat = Double.parseDouble(oriLati);
-        double oriLng = Double.parseDouble(oriLngi);
+        type_ = intent.getStringExtra(driverJob_alert.typeI);
+        vehicle_ = intent.getStringExtra(driverJob_alert.vehicleI);
+        package_ = intent.getStringExtra(driverJob_alert.packageI);
 
-//        double oriLng = Double.parseDouble(intent.getStringExtra(driverJob_alert.oriLng));
-//        double oriLng = Double.parseDouble(intent.getStringExtra(driverJob_alert.oriLng));
+        typeFinding(oriLati, oriLngi, desLati, desLngi, type_, package_, vehicle_);
 
-        oriLatlng = new LatLng(oriLat, oriLng);
 
         // Initializing
         MarkerPoints = new ArrayList<>();
@@ -178,6 +188,98 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         turnOnGPS();
     }
+
+    //convertiong
+    public void typeFinding(String oriLati, String oriLngi, String desLati, String desLngi, String type_, String package_, String vehicle_)
+    {
+        //converting string to double
+        double oriLat = Double.parseDouble(oriLati);
+        double oriLng = Double.parseDouble(oriLngi);
+        double desLat = Double.parseDouble(desLati);
+        double desLng = Double.parseDouble(desLngi);
+
+        //converting double to latlng
+        oriLatlng = new LatLng(oriLat, oriLng);
+        desLatlng = new LatLng(desLat, desLng);
+
+        switch (type_)
+        {
+            case "rental":
+                rentalAnimator(oriLatlng);
+            case "city":
+                cityAnimator(oriLatlng, desLatlng);
+            case "outstation":
+                MarkerOptions markerOptionsOri = new MarkerOptions();
+                markerOptionsOri.position(oriLatlng);
+                markerOptionsOri.title("Starting point");
+                markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                oriMarker = mMap.addMarker(markerOptionsOri);
+
+                MarkerOptions markerOptionsDes = new MarkerOptions();
+                markerOptionsDes.position(desLatlng);
+                markerOptionsDes.title("Destination point");
+                markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                destMarker = mMap.addMarker(markerOptionsDes);
+
+                //calling polyline
+                animatePath(oriLatlng, desLatlng);
+                //calling zoomfuntion
+                zoomout(oriMarker, destMarker);
+
+            default:
+                Toast.makeText(this, "Can't get the Travel type", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void cityAnimator(LatLng oriLatlng, LatLng desLatlng) {
+        MarkerOptions markerOptionsOri = new MarkerOptions();
+        markerOptionsOri.position(oriLatlng);
+        markerOptionsOri.title("Starting point");
+        markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        oriMarker = mMap.addMarker(markerOptionsOri);
+
+        MarkerOptions markerOptionsDes = new MarkerOptions();
+        markerOptionsDes.position(desLatlng);
+        markerOptionsDes.title("Destination point");
+        markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        destMarker = mMap.addMarker(markerOptionsDes);
+
+        //calling polyline
+        animatePath(oriLatlng, desLatlng);
+        //calling zoomfuntion
+        zoomout(oriMarker, destMarker);
+    }
+
+    public void rentalAnimator(LatLng oriLatlng)
+    {
+        MarkerOptions markerOptionsOri = new MarkerOptions();
+        markerOptionsOri.position(oriLatlng);
+        markerOptionsOri.title("Starting point");
+        markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        oriMarker = mMap.addMarker(markerOptionsOri);
+
+        //calling polyline
+        animatePath(userLatlng, oriLatlng);
+        //calling zoomfuntion
+    }
+
+//    private void zoomout(Marker oriMarker) {
+//        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+//
+////the include method will calculate the min and max bound.
+//        builder.include(oriMarker.getPosition());
+//        builder.include(userMarker.getPosition());
+//
+//        LatLngBounds bounds = builder.build();
+//
+//        int width = getResources().getDisplayMetrics().widthPixels;
+//        int height = getResources().getDisplayMetrics().heightPixels;
+//        int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+//
+//        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+//
+//        mMap.animateCamera(cu);
+//    }
 
     private void turnOnGPS() {
 
@@ -310,7 +412,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onLocationChanged(Location location) {
         //Place current location marker
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        userLatlng= new LatLng(location.getLatitude(), location.getLongitude());
         Geocoder geocoder;
         List<Address> addresses;
         String address = "";
@@ -329,10 +431,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         options = new MarkerOptions();
 
         // Setting the position of the marker
-        options.position(latLng);
+        options.position(userLatlng);
 
         //move map camerax
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(userLatlng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
 
         //stop location updates
@@ -346,14 +448,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        markerOptionsOri.position(latLng1);
 //        markerOptionsOri.title("Starting point");
 //        markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-//        oriMarker = mMap.addMarker(markerOptionsOri);
+//        userMarker = mMap.addMarker(markerOptionsOri);
 //        mMap.addMarker(markerOptionsOri).setDraggable(true);
 //        MarkerPoints.add(0, latLng1);
 //        //move map camera
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
 //        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-        animatePath(oriLatlng, latLng);
     }
+
+    public void zoomout(Marker oriMarker, Marker destMarker)
+    {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+//the include method will calculate the min and max bound.
+        builder.include(oriMarker.getPosition());
+        builder.include(destMarker.getPosition());
+
+        LatLngBounds bounds = builder.build();
+
+        int width = getResources().getDisplayMetrics().widthPixels;
+        int height = getResources().getDisplayMetrics().heightPixels;
+        int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+
+        mMap.animateCamera(cu);
+    }
+
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -372,6 +493,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onConnectionSuspended(int i) {
 
     }
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
@@ -402,120 +524,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
             }
-        }
-    }
-
-    public void addMarker(Place place) {
-
-        try {
-
-            if (pickP == 1) {
-                if (oriMarker != null) {
-                    oriMarker.remove();
-                    MarkerPoints.remove(0);
-                }
-
-                MarkerOptions markerOptionsOri = new MarkerOptions();
-                markerOptionsOri.position(place.getLatLng());
-                markerOptionsOri.title("Starting point");
-                markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-                oriMarker = mMap.addMarker(markerOptionsOri);
-                mMap.addMarker(markerOptionsOri).setDraggable(true);
-                MarkerPoints.add(0, place.getLatLng());
-                //move map camera
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-            } else {
-                if (destMarker != null) {
-                    destMarker.remove();
-                    MarkerPoints.remove(1);
-                }
-                MarkerOptions markerOptionsDes = new MarkerOptions();
-                markerOptionsDes.position(place.getLatLng());
-                markerOptionsDes.title("Destination point");
-                markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                destMarker = mMap.addMarker(markerOptionsDes);
-                mMap.addMarker(markerOptionsDes).setDraggable(true);
-                MarkerPoints.add(1, place.getLatLng());
-                //move map camera
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-            }
-
-            if (MarkerPoints.size() > 1) {
-                origin = MarkerPoints.get(0);
-                dest = MarkerPoints.get(1);
-                Log.i(LOG_TAG, "origin marker: " + origin.toString());
-                Log.i(LOG_TAG, "destination marker: " + dest.toString());
-
-                origin = MarkerPoints.get(0);
-                dest = MarkerPoints.get(1);
-
-                animatePath(origin, dest);
-            }
-
-
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            Log.i("Error in  ", e.getMessage());
-            Toast.makeText(this, "Error in Search", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void getRide(Place place) {
-
-        try {
-
-            if (pickP == 1) {
-                if (oriMarker != null) {
-                    oriMarker.remove();
-                    MarkerPoints.remove(0);
-                }
-
-                MarkerOptions markerOptionsOri = new MarkerOptions();
-                markerOptionsOri.position(place.getLatLng());
-                markerOptionsOri.title("Starting point");
-                markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-                oriMarker = mMap.addMarker(markerOptionsOri);
-                mMap.addMarker(markerOptionsOri).setDraggable(true);
-                MarkerPoints.add(0, place.getLatLng());
-                //move map camera
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-            } else {
-                if (destMarker != null) {
-                    destMarker.remove();
-                    MarkerPoints.remove(1);
-                }
-                MarkerOptions markerOptionsDes = new MarkerOptions();
-                markerOptionsDes.position(place.getLatLng());
-                markerOptionsDes.title("Destination point");
-                markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                destMarker = mMap.addMarker(markerOptionsDes);
-                mMap.addMarker(markerOptionsDes).setDraggable(true);
-                MarkerPoints.add(1, place.getLatLng());
-                //move map camera
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-            }
-
-            if (MarkerPoints.size() > 1) {
-                origin = MarkerPoints.get(0);
-                dest = MarkerPoints.get(1);
-                Log.i(LOG_TAG, "origin marker: " + origin.toString());
-                Log.i(LOG_TAG, "destination marker: " + dest.toString());
-
-                origin = MarkerPoints.get(0);
-                dest = MarkerPoints.get(1);
-
-                animatePath(origin, dest);
-            }
-
-
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            Log.i("Error in  ", e.getMessage());
-            Toast.makeText(this, "Error in Search", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -601,17 +609,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void getRide(View view) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage("Did you pick up the customer ?");
-                alertDialogBuilder.setPositiveButton("yes",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface arg0, int arg1) {
+        alertDialogBuilder.setPositiveButton("yes",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        startTimerDistance();
+                    }
+                });
 
-                                startTimerDistance();
-
-                            }
-                        });
-
-        alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 finish();

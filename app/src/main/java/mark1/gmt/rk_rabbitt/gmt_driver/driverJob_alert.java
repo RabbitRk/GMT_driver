@@ -51,6 +51,12 @@ public class driverJob_alert extends AppCompatActivity {
     TextView book_idTxt, typeTxt, vehicleTxt, package_idTxt, pickupTxt, dropTxt, timeTxt;
 
     public static final String oriLata = "orilat", oriLnga = "orilng";
+    public static final String desLata = "deslat", desLnga = "deslng";
+
+    public static final String typeI = "type";
+    public static final String vehicleI = "vehicle";
+    public static final String packageI = "package";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,9 +135,15 @@ public class driverJob_alert extends AppCompatActivity {
         ringtone.stop();
 
         dbHelpar.insertdata(book_id, time, type, vehicle, pickup, drop, package_type);
+
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra(oriLata, ori_lat);
         intent.putExtra(oriLnga, ori_lng);
+        intent.putExtra(desLata, dest_lat);
+        intent.putExtra(desLnga, dest_lng);
+        intent.putExtra(typeI, type);
+        intent.putExtra(vehicleI, vehicle);
+        intent.putExtra(packageI, package_type);
 
         startActivity(intent);
     }
