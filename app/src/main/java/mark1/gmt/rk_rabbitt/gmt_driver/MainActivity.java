@@ -1,6 +1,12 @@
 package mark1.gmt.rk_rabbitt.gmt_driver;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -12,6 +18,9 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
+
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     dbHelper database;
     job_alert_adapter recycler;
     List<recycleAdapter> productAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +51,26 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         productAdapter = new ArrayList<>();
         //code begins
         database = new dbHelper(this);
+
+        ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+        /*
+        tvLatitud.setText("No se tienen permisos");
+        ...
+         */
+
+            return;
+        }else
+        {
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            LatLng userlatlang=new LatLng(location.getLatitude(),location.getLongitude());
+            Toast.makeText(this,userlatlang.toString(),Toast.LENGTH_SHORT).show();
+            Log.i("latlngof",userlatlang.toString());
+        }
 
 //        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
 //        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
@@ -63,6 +93,31 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         job_alert_recycler.setItemAnimator(new DefaultItemAnimator());
 
         job_alert_recycler.setAdapter(recycler);
+
+//        LocationManager myloc = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//        boolean network_enabled = myloc.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+//        Log.i("latlngof","er0");
+//        if (network_enabled) {
+//            Log.i("latlngof","er1");
+//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                // TODO: Consider calling
+//                //    ActivityCompat#requestPermissions
+//                // here to request the missing permissions, and then overriding
+//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                //                                          int[] grantResults)
+//                // to handle the case where the user grants the permission. See the documentation
+//                // for ActivityCompat#requestPermissions for more details.
+//                Log.i("latlngof","error");
+//                return;
+//            }
+//            Log.i("latlngof","er2");
+//            Location my_location = myloc.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//            LatLng userLatlng=new LatLng(my_location.getLatitude(),my_location.getLongitude());
+//            Log.i("latlngof",userLatlng.toString());
+//            Toast.makeText(this,userLatlng.toString(),Toast.LENGTH_SHORT).show();
+//        }
+//
+
     }
 
     public void agreeJob(View view) {
@@ -79,4 +134,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         Toast.makeText(this, "login", Toast.LENGTH_SHORT).show();
     }
+
+//    @Override
+//    public void onLocationChanged(Location location) {
+//        LatLng userlatlang=new LatLng(location.getLatitude(),location.getLongitude());
+//        Toast.makeText(this,userlatlang.toString(),Toast.LENGTH_SHORT).show();
+//        Log.i("latlngof",userlatlang.toString());
+//    }
 }

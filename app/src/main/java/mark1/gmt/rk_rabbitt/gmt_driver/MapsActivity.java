@@ -1,9 +1,11 @@
 package mark1.gmt.rk_rabbitt.gmt_driver;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.location.Criteria;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -48,6 +50,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -69,6 +72,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONObject;
 
@@ -123,14 +128,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     MarkerOptions options = new MarkerOptions();
     private Marker oriMarker, destMarker, userMarker;
     LocationRequest mLocationRequest;
+    Location mLastLocation;
     LatLng origin, dest;
     //Type Variable says about rent or city or out
     String type;
     public static final String LOG_TAG = "MapsActivity";
-
     LinearLayout travel_type;
 
     LatLng oriLatlng, desLatlng, userLatlng;
+    Location my_location;
 
     String oriLati;
     String oriLngi;
@@ -138,6 +144,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     String desLngi;
 
     String type_, package_, vehicle_;
+    final int REQUEST_FINE_LOCATION = 1234;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -145,20 +152,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
 
         checkLocationPermission();
-
-        //getting intent values
-        Intent intent = getIntent();
-        oriLati = intent.getStringExtra(driverJob_alert.oriLata);
-        oriLngi = intent.getStringExtra(driverJob_alert.oriLnga);
-        desLati = intent.getStringExtra(driverJob_alert.oriLnga);
-        desLngi = intent.getStringExtra(driverJob_alert.oriLnga);
-
-        type_ = intent.getStringExtra(driverJob_alert.typeI);
-        vehicle_ = intent.getStringExtra(driverJob_alert.vehicleI);
-        package_ = intent.getStringExtra(driverJob_alert.packageI);
-
-        typeFinding(oriLati, oriLngi, desLati, desLngi, type_, package_, vehicle_);
-
 
         // Initializing
         MarkerPoints = new ArrayList<>();
@@ -181,13 +174,53 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         mapFragment.getMapAsync(this);
 
+
+        //get Current Location on app launch
+
+        currLoc();
+
+
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, 0 /* clientId */, this)
                 .addApi(Places.GEO_DATA_API)
                 .build();
 
         turnOnGPS();
+
+        //getting intent values
+        Intent intent = getIntent();
+        oriLati = intent.getStringExtra(driverJob_alert.oriLata);
+        oriLngi = intent.getStringExtra(driverJob_alert.oriLnga);
+        desLati = intent.getStringExtra(driverJob_alert.desLata);
+        desLngi = intent.getStringExtra(driverJob_alert.desLnga);
+
+        type_ = intent.getStringExtra(driverJob_alert.typeI);
+        vehicle_ = intent.getStringExtra(driverJob_alert.vehicleI);
+        package_ = intent.getStringExtra(driverJob_alert.packageI);
+
     }
+
+    private void currLoc() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+        /*
+        tvLatitud.setText("No se tienen permisos");
+        ...
+         */
+
+            return;
+        }else
+        {
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            userLatlng=new LatLng(location.getLatitude(),location.getLongitude());
+            Toast.makeText(this,userLatlng.toString(),Toast.LENGTH_SHORT).show();
+            Log.i("latlngof",userLatlng.toString());
+        }
+
+    }
+
 
     //convertiong
     public void typeFinding(String oriLati, String oriLngi, String desLati, String desLngi, String type_, String package_, String vehicle_) {
@@ -204,10 +237,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch (type_) {
             case "rental":
                 rentalAnimator(oriLatlng);
+                break;
             case "city":
                 cityAnimator(oriLatlng, desLatlng);
+                break;
             case "outstation":
                 outstationAnimator(oriLatlng, desLatlng);
+                break;
             default:
                 Toast.makeText(this, "Can't get the Travel type", Toast.LENGTH_SHORT).show();
         }
@@ -223,7 +259,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         MarkerOptions markerOptionsDes = new MarkerOptions();
         markerOptionsDes.position(desLatlng);
         markerOptionsDes.title("Destination point");
-        markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
         destMarker = mMap.addMarker(markerOptionsDes);
 
         //calling polyline
@@ -243,7 +279,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         MarkerOptions markerOptionsDes = new MarkerOptions();
         markerOptionsDes.position(desLatlng);
         markerOptionsDes.title("Destination point");
-        markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        markerOptionsDes.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         destMarker = mMap.addMarker(markerOptionsDes);
 
         //calling polyline
@@ -253,11 +289,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void rentalAnimator(LatLng oriLatlng) {
+
         MarkerOptions markerOptionsOri = new MarkerOptions();
         markerOptionsOri.position(oriLatlng);
         markerOptionsOri.title("Starting point");
-        markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-        oriMarker = mMap.addMarker(markerOptionsOri);
+        markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
+//        oriMarker = mMap.addMarker(markerOptionsOri);
+        mMap.addMarker(markerOptionsOri);
+
+        Log.i(LOG_TAG, "   "+oriLatlng.toString());
 
         //calling polyline
         animatePath(userLatlng, oriLatlng);
@@ -269,6 +309,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //
 ////the include method will calculate the min and max bound.
 //        builder.include(oriMarker.getPosition());
+//        builder.include(userMarker.getPosition());
 //        builder.include(userMarker.getPosition());
 //
 //        LatLngBounds bounds = builder.build();
@@ -377,7 +418,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -389,7 +429,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.i(LOG_TAG,"mapready");
         mMap = googleMap;
+
+        typeFinding(oriLati, oriLngi, desLati, desLngi, type_, package_, vehicle_);
 
         googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
 
@@ -399,7 +442,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-
+//        Location mylocation = googleMap.getMyLocation();
+//        Log.i(LOG_TAG, String.valueOf(mylocation.getLatitude() +"   "+mylocation.getLongitude()));
         //Initialize Google Play Services
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -478,6 +522,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        Log.i(LOG_TAG, "connected");
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
@@ -493,7 +538,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onConnectionSuspended(int i) {
 
     }
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
