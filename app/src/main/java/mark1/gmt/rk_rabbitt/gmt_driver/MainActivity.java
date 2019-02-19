@@ -47,40 +47,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         login = findViewById(R.id.switch1);
         job_alert_recycler = findViewById(R.id.jobsRecycler);
         login.setOnCheckedChangeListener(this);
+        login.setSwitchPadding(40);
+//        login.setChecked(true);
 
         productAdapter = new ArrayList<>();
         //code begins
         database = new dbHelper(this);
-
-        ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-        /*
-        tvLatitud.setText("No se tienen permisos");
-        ...
-         */
-
-            return;
-        }else
-        {
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            LatLng userlatlang=new LatLng(location.getLatitude(),location.getLongitude());
-            Toast.makeText(this,userlatlang.toString(),Toast.LENGTH_SHORT).show();
-            Log.i("latlngof",userlatlang.toString());
-        }
-
-//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
-//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
-//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
-//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
-//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
-//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
-//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
-//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
-//        database.insertdata("book_id", "time", "type", "vehicle", "pickup", "drop", "package_type");
 
         productAdapter = database.getdata();
 
@@ -94,35 +66,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         job_alert_recycler.setAdapter(recycler);
 
-//        LocationManager myloc = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//        boolean network_enabled = myloc.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-//        Log.i("latlngof","er0");
-//        if (network_enabled) {
-//            Log.i("latlngof","er1");
-//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                // TODO: Consider calling
-//                //    ActivityCompat#requestPermissions
-//                // here to request the missing permissions, and then overriding
-//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                //                                          int[] grantResults)
-//                // to handle the case where the user grants the permission. See the documentation
-//                // for ActivityCompat#requestPermissions for more details.
-//                Log.i("latlngof","error");
-//                return;
-//            }
-//            Log.i("latlngof","er2");
-//            Location my_location = myloc.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//            LatLng userLatlng=new LatLng(my_location.getLatitude(),my_location.getLongitude());
-//            Log.i("latlngof",userLatlng.toString());
-//            Toast.makeText(this,userLatlng.toString(),Toast.LENGTH_SHORT).show();
-//        }
-//
-
-    }
-
-    public void agreeJob(View view) {
-        Intent maps = new Intent(this, MapsActivity.class);
-        startActivity(maps);
     }
 
     public void gotoMap(View view) {
@@ -132,7 +75,16 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        Toast.makeText(this, "login", Toast.LENGTH_SHORT).show();
+        if (isChecked)
+        {
+            Toast.makeText(this, "login", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(this, "logout", Toast.LENGTH_SHORT).show();
+        }
+
+
     }
 
 //    @Override

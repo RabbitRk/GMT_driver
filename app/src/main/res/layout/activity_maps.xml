@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".MapsActivity">
 
+    <ProgressBar
+        android:id="@+id/progressBar_cyclic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"
+        android:minWidth="50dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/map"
@@ -34,5 +43,11 @@
             android:layout_height="wrap_content"
             android:onClick="decline"
             android:text="Decline" />
+        <TextView
+            android:id="@+id/dist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            />
     </LinearLayout>
 </RelativeLayout>

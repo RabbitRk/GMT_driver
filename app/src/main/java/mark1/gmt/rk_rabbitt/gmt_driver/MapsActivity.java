@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -133,6 +134,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Type Variable says about rent or city or out
     String type;
     public static final String LOG_TAG = "MapsActivity";
+    public static final String LOG = "rkdk";
     LinearLayout travel_type;
 
     LatLng oriLatlng, desLatlng, userLatlng;
@@ -145,16 +147,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     String type_, package_, vehicle_;
     final int REQUEST_FINE_LOCATION = 1234;
+    private double distanceTraveledValue;
+    TextView distance;
+    LocationListener mloclisterner;
 
+    ProgressBar progressBar;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
+        Log.i(LOG, "oncreate");
         checkLocationPermission();
 
         // Initializing
+        distance = findViewById(R.id.dist);
         MarkerPoints = new ArrayList<>();
+        progressBar = findViewById(R.id.progressBar_cyclic);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -174,10 +182,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         mapFragment.getMapAsync(this);
 
-
+        mloclisterner = new MyLocationListener();
         //get Current Location on app launch
 
-        currLoc();
+//        currLoc();
 
 
 
@@ -199,27 +207,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         vehicle_ = intent.getStringExtra(driverJob_alert.vehicleI);
         package_ = intent.getStringExtra(driverJob_alert.packageI);
 
-    }
-
-    private void currLoc() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-        /*
-        tvLatitud.setText("No se tienen permisos");
-        ...
-         */
-
-            return;
-        }else
-        {
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            userLatlng=new LatLng(location.getLatitude(),location.getLongitude());
-            Toast.makeText(this,userLatlng.toString(),Toast.LENGTH_SHORT).show();
-            Log.i("latlngof",userLatlng.toString());
-        }
+        progressBar.setVisibility(View.VISIBLE);
 
     }
+
+//    private void currLoc() {
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+//        {
+//        /*
+//        tvLatitud.setText("No se tienen permisos");
+//        ...
+//         */
+//
+//            return;
+//        }else
+//        {
+//            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//            userLatlng=new LatLng(location.getLatitude(),location.getLongitude());
+//            Toast.makeText(this,userLatlng.toString(),Toast.LENGTH_SHORT).show();
+//            Log.i("latlngof",userLatlng.toString());
+//        }
+//
+//    }
 
 
     //convertiong
@@ -419,6 +429,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     protected synchronized void buildGoogleApiClient() {
+        Log.i(LOG, "buildgoogleapiclient");
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -429,10 +441,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.i(LOG_TAG,"mapready");
+        Log.i(LOG,"mapready");
         mMap = googleMap;
 
-        typeFinding(oriLati, oriLngi, desLati, desLngi, type_, package_, vehicle_);
 
         googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
 
@@ -451,11 +462,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
-
+//finding the type of the ride
+//        typeFinding(oriLati, oriLngi, desLati, desLngi, type_, package_, vehicle_);
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.i(LOG, "locationchanged");
+
         //Place current location marker
         userLatlng = new LatLng(location.getLatitude(), location.getLongitude());
         Geocoder geocoder;
@@ -487,24 +501,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
 
+        Toast.makeText(this, "userlatlng..."+userLatlng.toString(), Toast.LENGTH_SHORT).show();
 //      //  creating marker onload as staring
 //        LatLng latLng1 = new LatLng(location.getLatitude(), location.getLongitude());
-//        MarkerOptions markerOptionsOri = new MarkerOptions();
-//        markerOptionsOri.position(latLng1);
-//        markerOptionsOri.title("Starting point");
-//        markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-//        userMarker = mMap.addMarker(markerOptionsOri);
-//        mMap.addMarker(markerOptionsOri).setDraggable(true);
-//        MarkerPoints.add(0, latLng1);
-//        //move map camera
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
-//        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+
+        if (userMarker!=null)
+        {
+            userMarker.remove();
+        }
+
+        MarkerOptions markerOptionsOri = new MarkerOptions();
+        markerOptionsOri.position(userLatlng);
+        markerOptionsOri.title("Your are here");
+        markerOptionsOri.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+        userMarker = mMap.addMarker(markerOptionsOri);
+        mMap.addMarker(markerOptionsOri).setDraggable(true);
+        MarkerPoints.add(0, userLatlng);
+        //move map camera
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(userLatlng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
     }
 
     public void zoomout(Marker oriMarker, Marker destMarker) {
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-//the include method will calculate the min and max bound.
+        Log.i(LOG, "zooomout");
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        //the include method will calculate the min and max bound.
         builder.include(oriMarker.getPosition());
         builder.include(destMarker.getPosition());
 
@@ -512,17 +535,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;
-        int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+        int padding = (int) (width * 0.30); // offset from edges of the map 10% of screen
 
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
-
         mMap.animateCamera(cu);
     }
 
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.i(LOG_TAG, "connected");
+        Log.i(LOG, "connected");
+        progressBar.setVisibility(View.GONE);
+
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
@@ -532,18 +556,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
+        typeFinding(oriLati, oriLngi, desLati, desLngi, type_, package_, vehicle_);
     }
 
     @Override
     public void onConnectionSuspended(int i) {
+        Log.i(LOG, "onconsuspend");
 
     }
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.i(LOG, "onconfailed");
 
     }
 
     public void checkLocationPermission() {
+        Log.i(LOG, "checklocationpermission");
+
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -672,11 +701,42 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         alertDialog.show();
     }
 
-    private void startTimerDistance() {
+    private void startTimerDistance()
+    {
 
-        Toast.makeText(this, "hello", Toast.LENGTH_SHORT).show();
     }
+    public class MyLocationListener implements LocationListener {
+        /**
+         * Used for calculating distance between current and previous
+         * locations.
+         */
+        private Location previousLocation;
 
+        @Override
+        public void onLocationChanged(Location loc) {
+            //loc.getLatitude();
+            //loc.getLongitude();
+
+            if (previousLocation != null) {
+                if (previousLocation == loc) //If true, we have not moved.
+                {
+                    return;
+                }
+                //GPS has built-in
+                else// (loc.distanceTo(previousLocation) > 1.0d)
+                {
+                    //distance defined using the WGS84 ellipsoid
+                    // -- error < 2cm
+                    distanceTraveledValue += Math.abs(loc.distanceTo(previousLocation));
+                    previousLocation = new Location(loc);
+                    distance.setText(Double.toString(((int) distanceTraveledValue)) + " meters");
+                }
+            } else // when PreviousLocation = null, we need to assign our first previousLocation;
+            {
+                previousLocation = new Location(loc);
+            }
+        }
+    }
     public void decline(View view) {
         Toast.makeText(this, "Declined", Toast.LENGTH_SHORT).show();
         finish();

@@ -1,7 +1,9 @@
 package mark1.gmt.rk_rabbitt.gmt_driver;
 
 import android.app.Application;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.Ringtone;
@@ -132,9 +134,16 @@ public class driverJob_alert extends AppCompatActivity {
 
     public void gotoNavigation(View view) {
 
+
         ringtone.stop();
 
         dbHelpar.insertdata(book_id, time, type, vehicle, pickup, drop, package_type);
+
+        //close the notification jon the notificaiton bar
+
+        NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+
 
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra(oriLata, ori_lat);
