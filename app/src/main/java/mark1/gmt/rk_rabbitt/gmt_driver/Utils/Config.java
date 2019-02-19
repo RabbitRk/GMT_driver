@@ -4,7 +4,7 @@ package mark1.gmt.rk_rabbitt.gmt_driver.Utils;
  * Created by Rabbitt on 19,February,2019
  */
 public class Config {
-        static final String USER_REGISTRATION = "http://192.168.43.252:8080/GotMyTrip/addUser.php";
+        public static final String STATUS_UPDATE = "http://192.168.43.252:8080/GotMyTrip/addUser.php";
         static final String OTP_VERIFICATION = "http://192.168.43.252:8080/GotMyTrip/checkotp.php";
         static final String USER_LOGIN = "http://192.168.43.252:8080/GotMyTrip/userLogin.php";
 
