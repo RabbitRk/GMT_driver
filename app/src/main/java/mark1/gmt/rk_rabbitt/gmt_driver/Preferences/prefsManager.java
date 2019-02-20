@@ -17,11 +17,13 @@ public class prefsManager {
     private static final String LOGIN = "IsFirstTimeLaunch";
 
     //user details
-    public static final String USER_PREFS = "USER_DETAILS";
-    public static final String ID_KEY = "ID_KEY";
-    public static final String TYPE = "USER_KEY";
-    public static final String USER_PHONE = "USER_PHONE";
-    public static final String USER_EMAIL = "USER_EMAIL";
+    private static final String USER_PREFS = "USER_DETAILS";
+    private static final String ID_KEY = "ID_KEY";
+    private static final String TYPE = "USER_KEY";
+    private static final String USER_PHONE = "USER_PHONE";
+    private static final String USER_EMAIL = "USER_EMAIL";
+
+    private static final String LOG_STATUS = "LOG_STATUS";
 
     @SuppressLint("CommitPrefEdits")
     public prefsManager(Context context) {
@@ -52,4 +54,10 @@ public class prefsManager {
         user_editor.putString(USER_PHONE,email);
         user_editor.commit();
     }
+    public void status(String stat)
+    {
+        user_editor.putString(LOG_STATUS,stat);
+        user_editor.commit();
+    }
+
 }

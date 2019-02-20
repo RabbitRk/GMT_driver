@@ -2,12 +2,15 @@ package mark1.gmt.rk_rabbitt.gmt_driver;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -52,30 +55,44 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     job_alert_adapter recycler;
     List<recycleAdapter> productAdapter;
     private RequestQueue requestQueue;
-
-
+    String token, userid;
+    prefsManager prefsManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         //setting preferences
-        prefsManager prefsManager = new prefsManager(getApplicationContext());
+        prefsManager = new prefsManager(getApplicationContext());
         prefsManager.setFirstTimeLaunch(true);
 
+        //switch buttom componenets
         login = findViewById(R.id.switch1);
         job_alert_recycler = findViewById(R.id.jobsRecycler);
         login.setOnCheckedChangeListener(this);
         login.setSwitchPadding(40);
-//        login.setChecked(true);
 
+        //getting shared prefs for login or logout
+        SharedPreferences shrp = getSharedPreferences("USER_DETAILS",MODE_PRIVATE);
+        String val = shrp.getString( "LOG_STATUS","");
+        assert val != null;
+        if (val.equals("1"))
+            login.setChecked(true);
+        else
+            login.setChecked(false);
+
+        //requestqueue for volley library
         requestQueue = Volley.newRequestQueue(this);
+
+        //product apdapter for attended jobs
         productAdapter = new ArrayList<>();
+
         //code begins
         database = new dbHelper(this);
 
         productAdapter = database.getdata();
 
+        //recycler goes on
         recycler = new job_alert_adapter(productAdapter);
 
         Log.i("HIteshdata", "" + productAdapter);
@@ -124,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new LocationListener() {
+        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 LatLng userlatlang = new LatLng(location.getLatitude(), location.getLongitude());
@@ -147,6 +164,79 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
             }
         });
+
+        tokenRegistration();
+    }
+
+    private void tokenRegistration() {
+        SharedPreferences shrp = getSharedPreferences(Config.SHARED_PREF, MODE_PRIVATE);
+        SharedPreferences shrpu = getSharedPreferences(Config.USER_PREFS, MODE_PRIVATE);
+
+        token = shrp.getString("token", null);
+        userid = shrpu.getString("ID_KEY",null);
+
+        if ((token == null) || (userid == null)) {
+            showAlert();
+        } else {
+            updateToken();
+        }
+    }
+
+    private void updateToken() {
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Config.TOKEN_UPDATE, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+
+                Log.i("Responce......outside", response);
+
+                if (response.equalsIgnoreCase("success")) {
+                    Log.i("Responce....in", response);
+                    Toast.makeText(getApplicationContext(), "Token updated Successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.i("Responce.............", response);
+                    Toast.makeText(getApplicationContext(), "Responce is  " + response, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i("Error", "volley response error");
+                Toast.makeText(getApplicationContext(), "Responce error failed   " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("CUS_ID", userid);
+                params.put("TOKEN", token);
+
+                Log.i("LNG", userid);
+                Log.i("LNG", token);
+                return params;
+            }
+        };
+
+        //inseting into  the iteluser table
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        requestQueue.add(stringRequest);
+
+    }
+
+    private void showAlert() {
+        AlertDialog alertDialog = new AlertDialog.Builder(getApplicationContext()).create();
+        alertDialog.setTitle("Token is not Available");
+        alertDialog.setMessage("Please contact Balaji");
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 
     public void gotoMap(View view) {
@@ -158,9 +248,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
             Toast.makeText(this, "login", Toast.LENGTH_SHORT).show();
+            prefsManager.status("1");
             statusUpdate("1");
         } else {
             Toast.makeText(this, "logout", Toast.LENGTH_SHORT).show();
+            prefsManager.status("0");
             statusUpdate("0");
         }
     }
