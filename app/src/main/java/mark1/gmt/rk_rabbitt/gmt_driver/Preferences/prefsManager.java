@@ -44,12 +44,12 @@ public class prefsManager {
         return pref.getBoolean(LOGIN, false);
     }
 
-    public void userPreferences(String id, String type)//, String phonenumber, String email)
+    public void userPreferences(String id, String type , String phonenumber, String email)
     {
         user_editor.putString(ID_KEY,id);
         user_editor.putString(TYPE,type);
-//        user_editor.putString(USER_EMAIL,phonenumber);
-//        user_editor.putString(USER_PHONE,email);
+        user_editor.putString(USER_EMAIL,phonenumber);
+        user_editor.putString(USER_PHONE,email);
         user_editor.commit();
     }
 }

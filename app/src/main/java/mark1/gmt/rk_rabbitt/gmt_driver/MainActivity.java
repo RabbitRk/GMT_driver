@@ -1,7 +1,6 @@
 package mark1.gmt.rk_rabbitt.gmt_driver;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -34,23 +33,9 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
-//import com.google.android.gms.common.ConnectionResult;
-//import com.google.android.gms.common.GoogleApiAvailability;
-//import com.google.android.gms.common.api.GoogleApiClient;
-//import com.google.android.gms.location.LocationListener;
-//import com.google.android.gms.location.LocationRequest;
-//import com.google.android.gms.location.LocationServices;
-//import com.google.android.gms.maps.CameraUpdateFactory;
-//import com.google.android.gms.maps.GoogleMap;
-//import com.google.android.gms.maps.OnMapReadyCallback;
-//import com.google.android.gms.maps.SupportMapFragment;
-//import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-//import com.google.android.gms.maps.model.LatLng;
-//import com.google.android.gms.maps.model.Marker;
-//import com.google.android.gms.maps.model.MarkerOptions;
-
 import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.dbHelper;
 import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.recycleAdapter;
+import mark1.gmt.rk_rabbitt.gmt_driver.Preferences.prefsManager;
 import mark1.gmt.rk_rabbitt.gmt_driver.Utils.Config;
 
 import static android.location.LocationManager.*;
@@ -68,11 +53,15 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     List<recycleAdapter> productAdapter;
     private RequestQueue requestQueue;
 
-    @SuppressLint("MissingPermission")
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //setting preferences
+        prefsManager prefsManager = new prefsManager(getApplicationContext());
+        prefsManager.setFirstTimeLaunch(true);
 
         login = findViewById(R.id.switch1);
         job_alert_recycler = findViewById(R.id.jobsRecycler);
@@ -158,16 +147,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
             }
         });
-
     }
-
-//    LocationManger lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-//        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new com.google.android.gms.location.LocationListener() {
-//        @Override
-//        public void onLocationChanged(Location location) {
-//            // TODO Auto-generated method stub
-//        }
-//    });
 
     public void gotoMap(View view) {
         Intent intent = new Intent(this, MapsActivity.class);
@@ -235,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public void onLocationChanged(Location location) {
         LatLng userlatlang = new LatLng(location.getLatitude(), location.getLongitude());
         Toast.makeText(this, userlatlang.toString(), Toast.LENGTH_SHORT).show();
-        Log.i("latlngof", userlatlang.toString());
+        Log.i("latlngofseperate", userlatlang.toString());
     }
+
 }
