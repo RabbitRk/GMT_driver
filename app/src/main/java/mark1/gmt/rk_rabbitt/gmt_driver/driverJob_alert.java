@@ -134,13 +134,10 @@ public class driverJob_alert extends AppCompatActivity {
 
     public void gotoNavigation(View view) {
 
-
         ringtone.stop();
-
         dbHelpar.insertdata(book_id, time, type, vehicle, pickup, drop, package_type);
 
         //close the notification jon the notificaiton bar
-
         NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
 

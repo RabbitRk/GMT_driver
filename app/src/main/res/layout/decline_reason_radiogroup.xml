@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/trafficRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Taffic" />
+
+        <RadioButton
+            android:id="@+id/breadkdownRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Breakdown" />
+
+        <RadioButton
+            android:id="@+id/dontKnowRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Dont know where the customer is" />
+
+    </RadioGroup>
+
+</LinearLayout>

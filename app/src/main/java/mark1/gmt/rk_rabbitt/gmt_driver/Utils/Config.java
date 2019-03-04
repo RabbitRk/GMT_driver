@@ -5,12 +5,14 @@ package mark1.gmt.rk_rabbitt.gmt_driver.Utils;
  */
 public class Config {
         public static final String STATUS_UPDATE = "http://192.168.43.252:8080/GotMyTrip/driverStatus.php";
-        public static final String SHARED_PREF = "TOKEN_PREFS   ";
         public static final String TOKEN_UPDATE = "http://192.168.43.252:8080/GotMyTrip/tokenUpdate.php";
         public static final String USER_LOGIN = "http://192.168.43.252:8080/GotMyTrip/driverLogin.php";
+        public static final String RATE_CALCULATION = "http://192.168.43.252:8080/GotMyTrip/rateCalculator.php";
+
+        public static final String SHARED_PREF = "TOKEN_PREFS";
         public static final String USER_PREFS = "USER_DETAILS";
 
-        static final String DISTANCE_CALC = "http://192.168.43.252:8080/GotMyTrip/distanceCalculator.php";
+        static final String DISTANCE_CALC = "http://192.168.43.252:8080/GotMyTrip/distanceCalculatoral.php";
         static final String CUSTOMER_CITY_BOOK = "http://192.168.43.252:8080/GotMyTrip/cityBooking.php";
         static final String CUSTOMER_RENTAL_BOOK = "http://192.168.43.252:8080/GotMyTrip/rentalBooking.php";
         static final String CUSTOMER_OUTSTATION_BOOK = "http://192.168.43.252:8080/IntelGate/outstationBooking.php";

@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         //getting shared prefs for login or logout
         SharedPreferences shrp = getSharedPreferences("USER_DETAILS",MODE_PRIVATE);
         String val = shrp.getString( "LOG_STATUS","");
+
         assert val != null;
         if (val.equals("1"))
             login.setChecked(true);
@@ -104,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         job_alert_recycler.setAdapter(recycler);
 
         LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
 
         boolean network_enabled = locManager.isProviderEnabled(NETWORK_PROVIDER);
 

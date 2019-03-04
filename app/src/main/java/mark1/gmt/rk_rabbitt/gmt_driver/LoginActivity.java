@@ -69,12 +69,11 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (phone_number.getText().length()<10) {
+                if (phone_number.getText().length() < 10) {
                     phone_number.setError("Please enter valid Phone Number");
                     phone_number.requestFocus();
                 }
@@ -91,16 +90,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-
             }
+
             @Override
             public void afterTextChanged(Editable s) {
-                if (password.getText().length()<6) {
+                if (password.getText().length() < 6) {
                     password.setError("Enter the password");
                     password.requestFocus();
-
                 }
-
             }
         });
 
@@ -183,11 +180,8 @@ public class LoginActivity extends AppCompatActivity {
                 return params;
             }
         };
-
         //Adding request the the queue
         requestQueue.add(stringRequest);
-
-
     }
 
     private void loginto() {
@@ -202,5 +196,4 @@ public class LoginActivity extends AppCompatActivity {
         prefsManager.userPreferences(getId, PuserTxt, phoneTxt, PemailTxt);
         Log.i(LOG_TAG, "set preference Hid.............." + getId);
     }
-
 }

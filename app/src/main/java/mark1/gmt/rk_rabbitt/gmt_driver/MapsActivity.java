@@ -1,6 +1,7 @@
 package mark1.gmt.rk_rabbitt.gmt_driver;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentSender;
@@ -44,6 +45,11 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -88,6 +94,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
+import mark1.gmt.rk_rabbitt.gmt_driver.Utils.Config;
 
 /**
  * Created by Rabbitt on 01,February,2019
@@ -152,6 +161,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     LocationListener mloclisterner;
 
     ProgressBar progressBar;
+    RequestQueue requestQueue;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,6 +173,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         distance = findViewById(R.id.dist);
         MarkerPoints = new ArrayList<>();
         progressBar = findViewById(R.id.progressBar_cyclic);
+
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -277,7 +289,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //calling zoomfuntion
         zoomout(oriMarker, destMarker);
     }
-
 
     private void cityAnimator(LatLng oriLatlng, LatLng desLatlng) {
         MarkerOptions markerOptionsOri = new MarkerOptions();
@@ -680,6 +691,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void getRide(View view) {
+
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage("Did you pick up the customer ?");
         alertDialogBuilder.setPositiveButton("yes",
@@ -703,8 +715,52 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void startTimerDistance()
     {
+        //fetch value from the database
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Config.RATE_CALCULATION,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Log.i(LOG_TAG, "Responce.............." + response);
+
+                        try {
+                            if (response.equals("success")) {
+                                Toast.makeText(getApplicationContext(), "Status updated", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Error in status update", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (Exception ex) {
+                            Log.i(LOG_TAG, ex.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.i(LOG_TAG, "volley error.............................." + error.getMessage());
+                        Toast.makeText(getApplicationContext(), "Cant connect to the server", Toast.LENGTH_LONG).show();
+                    }
+                })
+
+        {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                //Adding the parameters to the request
+                params.put("TYPE", "101");
+                params.put("VEHICLE", "11.6542");
+                params.put("LNG", "76.6542");
+                params.put("ONDUTY", "");
+                return params;
+            }
+        };
+
+        //Adding request the the queue
+        requestQueue.add(stringRequest);
 
     }
+
     public class MyLocationListener implements LocationListener {
         /**
          * Used for calculating distance between current and previous
@@ -714,8 +770,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         @Override
         public void onLocationChanged(Location loc) {
-            //loc.getLatitude();
-            //loc.getLongitude();
 
             if (previousLocation != null) {
                 if (previousLocation == loc) //If true, we have not moved.
@@ -738,8 +792,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
     public void decline(View view) {
-        Toast.makeText(this, "Declined", Toast.LENGTH_SHORT).show();
-        finish();
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.decline_reason_radiogroup);
+        dialog.setTitle("Reason to Cancelling");
+        dialog.setCancelable(false);
+
+
     }
 
     // Fetches data from url passed
