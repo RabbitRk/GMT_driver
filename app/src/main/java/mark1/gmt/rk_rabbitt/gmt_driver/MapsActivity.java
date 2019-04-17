@@ -1,48 +1,34 @@
 package mark1.gmt.rk_rabbitt.gmt_driver;
 
-import android.annotation.SuppressLint;
+import android.Manifest;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.IntentSender;
-import android.content.SharedPreferences;
-import android.location.Criteria;
-import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.animation.TranslateAnimation;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
-
-import android.Manifest;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.Build;
+import android.location.LocationManager;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.widget.CardView;
-import android.view.DragEvent;
-import android.view.MenuItem;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -51,23 +37,17 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -79,8 +59,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONObject;
 
@@ -97,6 +75,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import mark1.gmt.rk_rabbitt.gmt_driver.Utils.Config;
+import mark1.gmt.rk_rabbitt.gmt_driver.odometer.odometer;
 
 /**
  * Created by Rabbitt on 01,February,2019
@@ -116,38 +95,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     GoogleApiClient mGoogleApiClient;
 
-    SharedPreferences userpref;
-//    TextView userTxt, useridTxt, phoneTxt, emailTxt;
-
-    //get pref variables
-    String user, idd, phone, emaill;
-
-    //variable declaration rk
-    private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
-            new LatLng(11.398194, 79.695358), new LatLng(11.916064, 79.812325));
-    private static final int REQUEST_SELECT_PICK = 1000;
-    public static final String MESSAGE = "OPTION";
-
-    int pickP = 0, dropP = 0;
-
-    Button rent_button, city_button, outstation_button;
-
     //map utils
     private GoogleMap mMap;
     ArrayList<LatLng> MarkerPoints;
     MarkerOptions options = new MarkerOptions();
     private Marker oriMarker, destMarker, userMarker;
     LocationRequest mLocationRequest;
-    Location mLastLocation;
-    LatLng origin, dest;
-    //Type Variable says about rent or city or out
-    String type;
     public static final String LOG_TAG = "MapsActivity";
-    public static final String LOG = "rkdk";
-    LinearLayout travel_type;
+    public static final String LOG = "rkRabbitt";
 
     LatLng oriLatlng, desLatlng, userLatlng;
-    Location my_location;
 
     String oriLati;
     String oriLngi;
@@ -155,13 +112,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     String desLngi;
 
     String type_, package_, vehicle_;
-    final int REQUEST_FINE_LOCATION = 1234;
     private double distanceTraveledValue;
     TextView distance;
     LocationListener mloclisterner;
 
     ProgressBar progressBar;
     RequestQueue requestQueue;
+
+    //track distance code starts here
+    odometer odo;
+    boolean bound;
+
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -174,6 +137,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         MarkerPoints = new ArrayList<>();
         progressBar = findViewById(R.id.progressBar_cyclic);
 
+        //distance tracking code
+        Intent intento = new Intent(this, odometer.class);
+        bindService(intento, connection, Context.BIND_AUTO_CREATE);
 
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -244,7 +210,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //    }
 
 
-    //convertiong
+    //convertions
     public void typeFinding(String oriLati, String oriLngi, String desLati, String desLngi, String type_, String package_, String vehicle_) {
         //converting string to double
         double oriLat = Double.parseDouble(oriLati);
@@ -269,6 +235,57 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             default:
                 Toast.makeText(this, "Can't get the Travel type", Toast.LENGTH_SHORT).show();
         }
+
+        //distance calculation
+        displayDistance();
+    }
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            odometer.OdometerBinder odometerBinder = (odometer.OdometerBinder) binder;
+            odo = odometerBinder.getOdometer();
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            bound = false;
+        }
+    };
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (bound) {
+            unbindService(connection);
+            bound = false;
+        }
+    }
+
+    private void displayDistance() {
+
+        final Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                double dist = 0.0;
+                if (bound && odo != null) {
+                    dist = odo.getDistance();
+                }
+                String distanceStr = String.format(Locale.getDefault(),
+                        "%1$,.2f", distance);
+                distance.setText(distanceStr);
+                handler.postDelayed(this, 1000);
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, odometer.class);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
     private void outstationAnimator(LatLng oriLatlng, LatLng desLatlng) {
@@ -561,13 +578,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
-        typeFinding(oriLati, oriLngi, desLati, desLngi, type_, package_, vehicle_);
+//        typeFinding(oriLati, oriLngi, desLati, desLngi, type_, package_, vehicle_);
     }
 
     @Override

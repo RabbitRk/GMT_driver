@@ -52,6 +52,8 @@
             </intent-filter>
         </service>
 
+        <service android:name=".odometer.odometer" />
+
         <activity
             android:name="MapsActivity"
             android:label="MapsActivity" />

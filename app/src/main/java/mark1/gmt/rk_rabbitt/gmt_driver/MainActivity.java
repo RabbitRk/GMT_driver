@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         //code begins
         database = new dbHelper(this);
-
+        Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
         productAdapter = database.getdata();
 
         //recycler goes on
@@ -166,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         });
 
         tokenRegistration();
+        showAlert();
     }
 
     private void tokenRegistration() {
@@ -176,8 +177,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         userid = shrpu.getString("ID_KEY",null);
 
         if ((token == null) || (userid == null)) {
+            Toast.makeText(this, "Token is null", Toast.LENGTH_SHORT).show();
             showAlert();
         } else {
+            Toast.makeText(this, "Token"+token, Toast.LENGTH_SHORT).show();
             updateToken();
         }
     }
@@ -223,19 +226,30 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         //inseting into  the iteluser table
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         requestQueue.add(stringRequest);
+        Log.i("Responce","Responce");
 
     }
 
     private void showAlert() {
-        AlertDialog alertDialog = new AlertDialog.Builder(getApplicationContext()).create();
-        alertDialog.setTitle("Token is not Available");
-        alertDialog.setMessage("Please contact Balaji");
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("please contact Balaji");
+        alertDialogBuilder.setTitle("Fatal Error");
+        alertDialogBuilder.setPositiveButton("yes",
                 new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+
                     }
                 });
+
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
