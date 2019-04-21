@@ -2,10 +2,12 @@ package mark1.gmt.rk_rabbitt.gmt_driver;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
@@ -22,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -41,6 +44,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -76,11 +80,12 @@ import java.util.Map;
 
 import mark1.gmt.rk_rabbitt.gmt_driver.Utils.Config;
 import mark1.gmt.rk_rabbitt.gmt_driver.odometer.odometer;
+import mark1.gmt.rk_rabbitt.gmt_driver.user_recognition.BackgroundDetectedActivitiesService;
+import mark1.gmt.rk_rabbitt.gmt_driver.user_recognition.Constants;
 
 /**
  * Created by Rabbitt on 01,February,2019
  */
-
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -122,7 +127,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //track distance code starts here
     odometer odo;
     boolean bound;
-
+    BroadcastReceiver broadcastReceiver;
+    private final int PERMISSION_REQUEST_CODE = 698;
 
 
     @Override
@@ -140,7 +146,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //distance tracking code
         Intent intento = new Intent(this, odometer.class);
         bindService(intento, connection, Context.BIND_AUTO_CREATE);
-
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -163,10 +168,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mloclisterner = new MyLocationListener();
         //get Current Location on app launch
 
-//        currLoc();
-
-
-
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, 0 /* clientId */, this)
                 .addApi(Places.GEO_DATA_API)
@@ -186,6 +187,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         package_ = intent.getStringExtra(driverJob_alert.packageI);
 
         progressBar.setVisibility(View.VISIBLE);
+
+        //distance tracking goes on
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Constants.BROADCAST_DETECTED_ACTIVITY)) {
+                    int type = intent.getIntExtra("type", -1);
+                    int confidence = intent.getIntExtra("confidence", 0);
+                    handleUserActivity(type, confidence);
+                }
+            }
+        };
+
+        startTracking();
 
     }
 
@@ -254,6 +269,71 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     };
 
+    private void handleUserActivity(int type, int confidence) {
+
+//        String label = getString(R.string.activity_unknown);
+//        int icon = R.drawable.activity_still;
+
+        boolean isRiding = false;
+        switch (type) {
+            case DetectedActivity.IN_VEHICLE: {
+                isRiding = true;
+                break;
+            }
+            case DetectedActivity.ON_BICYCLE: {
+                isRiding = true;
+                break;
+            }
+            case DetectedActivity.ON_FOOT: {
+                isRiding = false;
+                break;
+            }
+            case DetectedActivity.RUNNING: {
+                isRiding = false;
+                break;
+            }
+            case DetectedActivity.STILL: {
+                isRiding = false;
+                break;
+            }
+            case DetectedActivity.TILTING: {
+                isRiding = true;
+                break;
+            }
+            case DetectedActivity.WALKING: {
+                isRiding = true;
+                break;
+            }
+            case DetectedActivity.UNKNOWN: {
+                isRiding = false;
+                break;
+            }
+        }
+
+        if (isRiding)
+            displayDistance();
+
+        Log.e("user recognition", "User activity" + confidence);
+
+        if (confidence > Constants.CONFIDENCE) {
+//            txtActivity.setText(label);
+//            txtConfidence.setText("Confidence: " + confidence);
+//            imgActivity.setImageResource(icon);
+        }
+    }
+
+    private void startTracking() {
+        Intent intent1 = new Intent(MapsActivity.this, BackgroundDetectedActivitiesService.class);
+        startService(intent1);
+    }
+
+    private void stopTracking() {
+        Intent intent = new Intent(MapsActivity.this, BackgroundDetectedActivitiesService.class);
+        stopService(intent);
+    }
+
+
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -261,6 +341,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             unbindService(connection);
             bound = false;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter(Constants.BROADCAST_DETECTED_ACTIVITY));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (ContextCompat.checkSelfPermission(this,
+                odometer.PERMISSION_STRING)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{odometer.PERMISSION_STRING},
+                    PERMISSION_REQUEST_CODE);
+        } else {
+            Intent intent = new Intent(this, odometer.class);
+            bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
     private void displayDistance() {
@@ -281,12 +389,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Intent intent = new Intent(this, odometer.class);
-        bindService(intent, connection, Context.BIND_AUTO_CREATE);
-    }
 
     private void outstationAnimator(LatLng oriLatlng, LatLng desLatlng) {
         MarkerOptions markerOptionsOri = new MarkerOptions();
@@ -569,7 +671,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.animateCamera(cu);
     }
 
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.i(LOG, "connected");
@@ -592,6 +693,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.i(LOG, "onconsuspend");
 
     }
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.i(LOG, "onconfailed");
@@ -730,8 +832,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         alertDialog.show();
     }
 
-    private void startTimerDistance()
-    {
+    private void startTimerDistance() {
         //fetch value from the database
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Config.RATE_CALCULATION,
@@ -808,6 +909,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
+
     public void decline(View view) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.decline_reason_radiogroup);
