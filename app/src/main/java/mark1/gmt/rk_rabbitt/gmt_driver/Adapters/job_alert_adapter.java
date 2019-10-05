@@ -1,7 +1,7 @@
-package mark1.gmt.rk_rabbitt.gmt_driver;
+package mark1.gmt.rk_rabbitt.gmt_driver.Adapters;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.recycleAdapter;
+import mark1.gmt.rk_rabbitt.gmt_driver.R;
 
 /**
  * Created by Rabbitt on 06,February,2019

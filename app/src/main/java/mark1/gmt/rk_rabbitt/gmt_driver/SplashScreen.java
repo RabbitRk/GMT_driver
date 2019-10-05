@@ -3,7 +3,7 @@ package mark1.gmt.rk_rabbitt.gmt_driver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 import mark1.gmt.rk_rabbitt.gmt_driver.Preferences.prefsManager;
@@ -25,11 +25,11 @@ public class SplashScreen extends AppCompatActivity {
                 try {
                     prefsManager prefsManager = new prefsManager(getApplicationContext());
                     if (!prefsManager.isFirstTimeLaunch()) {
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(intent);
                         finish();
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
                         finish();
                     }

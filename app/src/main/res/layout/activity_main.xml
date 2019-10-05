@@ -7,24 +7,22 @@
     tools:context=".MainActivity"
     tools:layout_editor_absoluteY="81dp">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/tool"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/Login_page.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/Login_page.PopupOverlay">
-        </android.support.v7.widget.Toolbar>
+        </androidx.appcompat.widget.Toolbar>
 
 
-    </android.support.design.widget.AppBarLayout>
-
-
+    </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
         android:layout_below="@+id/tool"
@@ -34,7 +32,7 @@
         android:orientation="vertical"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.SwitchCompat
+        <androidx.appcompat.widget.SwitchCompat
 
             android:id="@+id/switch1"
             android:layout_width="wrap_content"
@@ -45,10 +43,12 @@
             android:layout_marginTop="0dp"
             android:layout_marginEnd="20dp"
             android:text="Login" />
-        <android.support.v7.widget.RecyclerView
+
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/jobsRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
     </LinearLayout>
 
     <LinearLayout

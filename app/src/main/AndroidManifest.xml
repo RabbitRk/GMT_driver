@@ -26,7 +26,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:allowBackup="true">
-        <activity android:name="MainActivity">
+        <activity android:name="SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
@@ -54,6 +54,7 @@
         </service>
 
         <service android:name=".odometer.odometer" />
+        <service android:name=".user_recognition.BackgroundDetectedActivitiesService" />
 
         <activity
             android:name="MapsActivity"
@@ -79,7 +80,7 @@
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="SplashScreen"
+            android:name="MainActivity"
             android:label="@string/title_activity_splash_screen"
             android:theme="@style/AppTheme" />
     </application>

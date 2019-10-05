@@ -36,7 +36,6 @@ public class recycleAdapter{
         return package_id;
     }
 
-
     public void setTimeat(String timeat) {
         this.timeat = timeat;
     }

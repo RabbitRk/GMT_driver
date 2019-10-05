@@ -6,34 +6,25 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.TaskStackBuilder;
 import android.util.Log;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.dbHelper;
-import mark1.gmt.rk_rabbitt.gmt_driver.MainActivity;
-import mark1.gmt.rk_rabbitt.gmt_driver.MapsActivity;
-import mark1.gmt.rk_rabbitt.gmt_driver.Preferences.prefsManager;
 import mark1.gmt.rk_rabbitt.gmt_driver.R;
+import mark1.gmt.rk_rabbitt.gmt_driver.Utils.Config;
 import mark1.gmt.rk_rabbitt.gmt_driver.driverJob_alert;
 
 /**
@@ -41,6 +32,7 @@ import mark1.gmt.rk_rabbitt.gmt_driver.driverJob_alert;
  */
 public class firebaseMessengingService extends FirebaseMessagingService {
 
+    private static final String TAG = "Firebase";
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
@@ -147,7 +139,7 @@ public class firebaseMessengingService extends FirebaseMessagingService {
                     .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
                     .setContentText(book_id + " " + type + " " + vehicle + " " + pickup + " " + drop + " " + package_type + " " + time)
                     .setFullScreenIntent(pendingIntent, true)
-                    .setVisibility(1)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setContentInfo("Info");
 
             notificationManager.notify(/*notification id*/1, notificationBuilder.build());
@@ -158,6 +150,26 @@ public class firebaseMessengingService extends FirebaseMessagingService {
         } catch (Exception e) {
             Log.e("remote", "Exception: " + e.getMessage());
         }
+    }
+
+
+    @Override
+    public void onNewToken(String token) {
+        Log.d(TAG, "Refreshed token: " + token);
+
+        // If you want to send messages to this application instance or
+        // manage this apps subscriptions on the server side, send the
+        // Instance ID token to your app server.
+
+        sendRegistrationToServer(token);
+    }
+
+    private void sendRegistrationToServer(String token) {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("token", token);
+        editor.apply();
+        editor.commit();
     }
 
 }

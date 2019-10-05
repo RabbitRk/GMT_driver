@@ -20,13 +20,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -78,6 +78,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import mark1.gmt.rk_rabbitt.gmt_driver.MapAnimator.DataParser;
+import mark1.gmt.rk_rabbitt.gmt_driver.MapAnimator.MapAnimator;
 import mark1.gmt.rk_rabbitt.gmt_driver.Utils.Config;
 import mark1.gmt.rk_rabbitt.gmt_driver.odometer.odometer;
 import mark1.gmt.rk_rabbitt.gmt_driver.user_recognition.BackgroundDetectedActivitiesService;
@@ -147,17 +149,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Intent intento = new Intent(this, odometer.class);
         bindService(intento, connection, Context.BIND_AUTO_CREATE);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
         assert mapFragment != null;
         View mapView = mapFragment.getView();
+
         if (mapView != null &&
                 mapView.findViewById(Integer.parseInt("1")) != null) {
             // Get the button view
             View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
             // and next place it, on bottom right (as Google Maps app)
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
-                    locationButton.getLayoutParams();
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
             // position on right bottom
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 100);
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -999,7 +1001,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     double lng = Double.parseDouble(point.get("lng"));
 
                     Toast.makeText(MapsActivity.this, "latitude " + lat + "....longitude " + lng, Toast.LENGTH_SHORT).show();
-
 //RkDk
                     LatLng position = new LatLng(lat, lng);
 

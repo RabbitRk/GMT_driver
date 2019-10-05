@@ -1,4 +1,4 @@
-package mark1.gmt.rk_rabbitt.gmt_driver;
+package mark1.gmt.rk_rabbitt.gmt_driver.MapAnimator;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;

@@ -4,13 +4,14 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -32,18 +33,18 @@ import java.util.Map;
 import mark1.gmt.rk_rabbitt.gmt_driver.Preferences.prefsManager;
 import mark1.gmt.rk_rabbitt.gmt_driver.Utils.Config;
 
-import static mark1.gmt.rk_rabbitt.gmt_driver.MapsActivity.LOG_TAG;
 
 public class LoginActivity extends AppCompatActivity {
 
 
+    private static final String LOG_TAG = "LoginActivity";
     private RequestQueue requestQueue;
 
     EditText password, phone_number;
     String passTxt, phoneTxt;
     String PuserTxt, PemailTxt, getId;
-    LoadingButton lb;
-    Boolean succes, ed = false;
+    Button lb;
+    Boolean succes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,47 +61,6 @@ public class LoginActivity extends AppCompatActivity {
 
         lb = findViewById(R.id.loading_btn);
         lb.setTypeface(Typeface.SERIF);
-        phone_number.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (phone_number.getText().length() < 10) {
-                    phone_number.setError("Please enter valid Phone Number");
-                    phone_number.requestFocus();
-                }
-            }
-        });
-
-
-        password.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (password.getText().length() < 6) {
-                    password.setError("Enter the password");
-                    password.requestFocus();
-                }
-            }
-        });
-
     }
 
     public void login(View view) {
@@ -138,23 +98,7 @@ public class LoginActivity extends AppCompatActivity {
                             PemailTxt = jb.getString("email");
 
                             setPrefsdetails();
-
-                            lb.startLoading(); //start loading
-                            new android.os.Handler().postDelayed(new Runnable() {
-                                public void run() {
-                                    //if details  is true
-                                    lb.loadingSuccessful();
-                                    succes = true;
-                                    new android.os.Handler().postDelayed(new Runnable() {
-                                        public void run() {
-                                            if (succes) {
-                                                lb.setEnabled(true);
-                                                loginto();
-                                            }
-                                        }
-                                    }, 1000);
-                                }
-                            }, 1500);
+                            loginto();
 
                         } catch (JSONException e) {
                             Log.i(LOG_TAG, "Json error.............." + e.getMessage());
@@ -177,6 +121,7 @@ public class LoginActivity extends AppCompatActivity {
                 //Adding the parameters to the request
                 params.put("passWord", passTxt);
                 params.put("phoneNumber", phoneTxt);
+
                 return params;
             }
         };

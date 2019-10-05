@@ -9,14 +9,14 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SwitchCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
+import mark1.gmt.rk_rabbitt.gmt_driver.Adapters.job_alert_adapter;
 import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.dbHelper;
 import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.recycleAdapter;
 import mark1.gmt.rk_rabbitt.gmt_driver.Preferences.prefsManager;
@@ -113,9 +114,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 //        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new com.google.android.gms.location.LocationListener() {
 //            @Override
 //            public void onLocationChanged(Location location) {
-//                // TODO Auto-generated method stub
+
 //            }
 //        });
+
         if (network_enabled) {
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -141,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
         locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {

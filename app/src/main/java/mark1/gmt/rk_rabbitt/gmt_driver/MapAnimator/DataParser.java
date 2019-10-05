@@ -1,4 +1,4 @@
-package mark1.gmt.rk_rabbitt.gmt_driver;
+package mark1.gmt.rk_rabbitt.gmt_driver.MapAnimator;
 
 import com.google.android.gms.maps.model.LatLng;
 

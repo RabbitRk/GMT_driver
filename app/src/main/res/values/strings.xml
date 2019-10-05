@@ -3,7 +3,9 @@
     <string name="title_activity_driver_job_alert">driverJob_alert</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="phonenumber">Phone Number</string>
-    <string name="gotmytrip_password">GotMyTrip Password</string>
+    <string name="gotmytrip_password">Password</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="title_activity_MainActivity">GMT</string>
+    <string name="Register_btn">Login</string>
 
 </resources>

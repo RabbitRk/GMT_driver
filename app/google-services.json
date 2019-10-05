@@ -1,0 +1,43 @@
+{
+  "project_info": {
+    "project_number": "122399678051",
+    "firebase_url": "https://gotmytrip-1544164116248.firebaseio.com",
+    "project_id": "gotmytrip-1544164116248",
+    "storage_bucket": "gotmytrip-1544164116248.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122399678051:android:ec647aa8cd9bff96",
+        "android_client_info": {
+          "package_name": "com.rabbitt.gotmytrip"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "122399678051-96njmqok4657nquq0dkvq22fjce4cej3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCeFMQgkeFS-YllHs1lWrvs7pNXOXA8UGc"
+        },
+        {
+          "current_key": "AIzaSyAdko4-9Ku-ngl3dS3vaOpLzbV66Tmce98"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "122399678051-96njmqok4657nquq0dkvq22fjce4cej3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
