@@ -16,12 +16,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.dx.dxloadingbutton.lib.LoadingButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,8 +35,6 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private static final String LOG_TAG = "LoginActivity";
-    private RequestQueue requestQueue;
-
     EditText password, phone_number;
     String passTxt, phoneTxt;
     String PuserTxt, PemailTxt, getId;
@@ -52,9 +47,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        //volley requestqueue initialization
-        requestQueue = Volley.newRequestQueue(this);
 
         password = findViewById(R.id.confirm_pass);
         phone_number = findViewById(R.id.phonenumber);
@@ -80,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         //Displaying a progress dialog
-        final ProgressDialog loading = ProgressDialog.show(this, "Registering", "Please wait...", false, false);
+        final ProgressDialog loading = ProgressDialog.show(this, "Getting Details", "Please wait...", false, false);
 
         //Again creating the string request
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Config.USER_LOGIN,
@@ -97,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
                             PuserTxt = jb.getString("name");
                             PemailTxt = jb.getString("email");
 
-                            setPrefsdetails();
+                            setPrefsdetails(getId, PuserTxt, PemailTxt);
                             loginto();
 
                         } catch (JSONException e) {
@@ -110,10 +102,9 @@ public class LoginActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         loading.dismiss();
                         Log.i(LOG_TAG, "volley error.............................." + error.getMessage());
-                        Toast.makeText(getApplicationContext(), "Username or Phone number not found", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "User not found", Toast.LENGTH_LONG).show();
                     }
                 })
-
         {
             @Override
             protected Map<String, String> getParams() {
@@ -121,24 +112,25 @@ public class LoginActivity extends AppCompatActivity {
                 //Adding the parameters to the request
                 params.put("passWord", passTxt);
                 params.put("phoneNumber", phoneTxt);
-
                 return params;
             }
         };
+
         //Adding request the the queue
-        requestQueue.add(stringRequest);
+        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
     }
 
     private void loginto() {
         Intent mainA = new Intent(getApplicationContext(), MainActivity.class);
+        mainA.putExtra("UserId", getId);
         startActivity(mainA);
         finish();
         Log.i(LOG_TAG, "Hid.............." + getId);
     }
 
-    private void setPrefsdetails() {
+    private void setPrefsdetails(String getId, String puserTxt, String pemailTxt) {
         prefsManager prefsManager = new prefsManager(this);
-        prefsManager.userPreferences(getId, PuserTxt, phoneTxt, PemailTxt);
-        Log.i(LOG_TAG, "set preference Hid.............." + getId);
+        prefsManager.userPreferences(getId, puserTxt, pemailTxt);
+        Log.i(LOG_TAG, "set preference Hid.............." + this.getId);
     }
 }

@@ -7,9 +7,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.TaskStackBuilder;
 import android.util.Log;
 
 import android.app.Notification;
@@ -30,6 +31,7 @@ import mark1.gmt.rk_rabbitt.gmt_driver.driverJob_alert;
 /**
  * Created by Rabbitt on 30,January,2019
  */
+
 public class firebaseMessengingService extends FirebaseMessagingService {
 
     private static final String TAG = "Firebase";
@@ -144,8 +146,7 @@ public class firebaseMessengingService extends FirebaseMessagingService {
 
             notificationManager.notify(/*notification id*/1, notificationBuilder.build());
 
-
-        } catch (JSONException e) {
+        } catch (JSONException e) {//maluKanna15:-*02Kk<3
             Log.e("remote", "Json Exception: " + e.getMessage());
         } catch (Exception e) {
             Log.e("remote", "Exception: " + e.getMessage());
@@ -154,7 +155,7 @@ public class firebaseMessengingService extends FirebaseMessagingService {
 
 
     @Override
-    public void onNewToken(String token) {
+    public void onNewToken(@NonNull String token) {
         Log.d(TAG, "Refreshed token: " + token);
 
         // If you want to send messages to this application instance or

@@ -22,6 +22,7 @@ public class prefsManager {
     private static final String TYPE = "USER_KEY";
     private static final String USER_PHONE = "USER_PHONE";
     private static final String USER_EMAIL = "USER_EMAIL";
+    private static final String USER_NAME = "USER_NAME";
 
     private static final String LOG_STATUS = "LOG_STATUS";
 
@@ -46,14 +47,13 @@ public class prefsManager {
         return pref.getBoolean(LOGIN, false);
     }
 
-    public void userPreferences(String id, String type , String phonenumber, String email)
-    {
+    public void userPreferences(String id, String username, String phonenumber) {
         user_editor.putString(ID_KEY,id);
-        user_editor.putString(TYPE,type);
-        user_editor.putString(USER_EMAIL,phonenumber);
-        user_editor.putString(USER_PHONE,email);
+        user_editor.putString(USER_NAME,username);
+        user_editor.putString(USER_PHONE,phonenumber);
         user_editor.commit();
     }
+
     public void status(String stat)
     {
         user_editor.putString(LOG_STATUS,stat);

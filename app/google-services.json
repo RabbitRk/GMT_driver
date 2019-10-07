@@ -1,37 +1,42 @@
 {
   "project_info": {
-    "project_number": "122399678051",
-    "firebase_url": "https://gotmytrip-1544164116248.firebaseio.com",
-    "project_id": "gotmytrip-1544164116248",
-    "storage_bucket": "gotmytrip-1544164116248.appspot.com"
+    "project_number": "286879065430",
+    "firebase_url": "https://gmt-driver-rk.firebaseio.com",
+    "project_id": "gmt-driver-rk",
+    "storage_bucket": "gmt-driver-rk.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:122399678051:android:ec647aa8cd9bff96",
+        "mobilesdk_app_id": "1:286879065430:android:c2a061fa9f5a9136ab62f7",
         "android_client_info": {
-          "package_name": "com.rabbitt.gotmytrip"
+          "package_name": "com.rabbitt.gotmytripdriver"
         }
       },
       "oauth_client": [
         {
-          "client_id": "122399678051-96njmqok4657nquq0dkvq22fjce4cej3.apps.googleusercontent.com",
+          "client_id": "286879065430-ifh5j1fk5g8v1pt0dbna57mm8fed23ms.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rabbitt.gotmytripdriver",
+            "certificate_hash": "aba49910ceea5daf36e01e2eaa0befda2e35fef9"
+          }
+        },
+        {
+          "client_id": "286879065430-chkvplet39h54iks3ar27livigqd1q4f.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCeFMQgkeFS-YllHs1lWrvs7pNXOXA8UGc"
-        },
-        {
-          "current_key": "AIzaSyAdko4-9Ku-ngl3dS3vaOpLzbV66Tmce98"
+          "current_key": "AIzaSyAntZzFhCEN7QdOaL5kmU03nSjex3f-kMU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "122399678051-96njmqok4657nquq0dkvq22fjce4cej3.apps.googleusercontent.com",
+              "client_id": "286879065430-chkvplet39h54iks3ar27livigqd1q4f.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

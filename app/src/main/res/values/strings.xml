@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GMT</string>
+    <string name="app_name">GMT - Driver</string>
     <string name="title_activity_driver_job_alert">driverJob_alert</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="phonenumber">Phone Number</string>

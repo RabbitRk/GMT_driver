@@ -19,6 +19,7 @@
         android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
         tools:ignore="ProtectedPermissions" />
 
+
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -34,15 +35,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- creating instance of the token -->
-        <service
-            android:name=".firebase_notification.firebaseInstanceService"
-            tools:ignore="ExportedService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-            </intent-filter>
-        </service>
 
         <!-- receive message in the background -->
         <service
