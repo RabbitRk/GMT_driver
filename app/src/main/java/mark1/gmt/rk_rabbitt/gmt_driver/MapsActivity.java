@@ -20,19 +20,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -181,6 +182,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Intent intent = getIntent();
         oriLati = intent.getStringExtra(driverJob_alert.oriLata);
         oriLngi = intent.getStringExtra(driverJob_alert.oriLnga);
+
         desLati = intent.getStringExtra(driverJob_alert.desLata);
         desLngi = intent.getStringExtra(driverJob_alert.desLnga);
 
@@ -721,8 +723,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
-
-
             } else {
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
@@ -753,7 +753,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Destination of route
         String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
-
 
         // Sensor enabled
         String sensor = "sensor=false";

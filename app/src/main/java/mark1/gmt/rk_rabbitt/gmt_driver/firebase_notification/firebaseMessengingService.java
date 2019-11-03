@@ -1,27 +1,26 @@
 package mark1.gmt.rk_rabbitt.gmt_driver.firebase_notification;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import android.util.Log;
-
-import android.app.Notification;
-import android.app.PendingIntent;
-import android.content.Intent;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import mark1.gmt.rk_rabbitt.gmt_driver.DBHelper.dbHelper;
 import mark1.gmt.rk_rabbitt.gmt_driver.R;
@@ -37,7 +36,6 @@ public class firebaseMessengingService extends FirebaseMessagingService {
     private static final String TAG = "Firebase";
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-
 
     public static String SHARED_PREFS= "SHARED_PREFS";
     public static String BOOK_ID = "BOOK_ID";
@@ -172,5 +170,4 @@ public class firebaseMessengingService extends FirebaseMessagingService {
         editor.apply();
         editor.commit();
     }
-
 }
